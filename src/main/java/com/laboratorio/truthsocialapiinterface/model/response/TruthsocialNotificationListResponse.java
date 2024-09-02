@@ -15,7 +15,6 @@ import lombok.Setter;
  */
 @Getter @Setter @AllArgsConstructor
 public class TruthsocialNotificationListResponse {
-    private String maxId;
     private String minId;
     private List<TruthsocialNotification> notifications;
 }
