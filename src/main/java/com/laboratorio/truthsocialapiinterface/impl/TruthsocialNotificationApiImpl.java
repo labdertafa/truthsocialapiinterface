@@ -18,7 +18,7 @@ import com.laboratorio.truthsocialapiinterface.TruthsocialNotificationApi;
  * @author Rafael
  * @version 1.1
  * @created 25/07/2024
- * @updated 01/09/2024
+ * @updated 02/09/2024
  */
 public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implements TruthsocialNotificationApi {
     public TruthsocialNotificationApiImpl(String accessToken) {
@@ -64,6 +64,7 @@ public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implement
             
             Gson gson = new Gson();
             String maxId = posicionInicial;
+            String minId = null;
             List<TruthsocialNotification> notifications = gson.fromJson(jsonStr, new TypeToken<List<TruthsocialNotification>>(){}.getType());
             if (!notifications.isEmpty()) {
                 log.debug("Se ejecutó la query: " + url);
@@ -73,10 +74,12 @@ public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implement
                 log.info("Recibí este link: " + linkHeader);
                 maxId = this.extractMaxId(linkHeader);
                 log.debug("Valor del max_id: " + maxId);
+                minId = this.extractMinId(linkHeader);
+                log.debug("Valor del min_id: " + minId);
             }
 
             // return accounts;
-            return new TruthsocialNotificationListResponse(maxId, notifications);
+            return new TruthsocialNotificationListResponse(maxId, minId, notifications);
         } catch (JsonSyntaxException e) {
             logException(e);
             throw e;
@@ -103,6 +106,7 @@ public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implement
         List<TruthsocialNotification> notifications = null;
         boolean continuar = true;
         String max_id = posicionInicial;
+        String min_id;
         
         if (quantity > 0) {
             usedLimit = Math.min(usedLimit, quantity);
@@ -118,6 +122,7 @@ public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implement
                 }
                 
                 max_id = notificationListResponse.getMaxId();
+                min_id = notificationListResponse.getMinId();
                 log.info("getAllNotifications. Cantidad: " + quantity + ". Recuperados: " + notifications.size() + ". Max_id: " + max_id);
                 if (notificationListResponse.getNotifications().isEmpty()) {
                     continuar = false;
@@ -135,10 +140,10 @@ public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implement
             } while (continuar);
 
             if (quantity == 0) {
-                return new TruthsocialNotificationListResponse(max_id, notifications);
+                return new TruthsocialNotificationListResponse(max_id, min_id, notifications);
             }
             
-            return new TruthsocialNotificationListResponse(max_id, notifications.subList(0, Math.min(quantity, notifications.size())));
+            return new TruthsocialNotificationListResponse(max_id, min_id, notifications.subList(0, Math.min(quantity, notifications.size())));
         } catch (Exception e) {
             throw e;
         }

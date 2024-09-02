@@ -20,7 +20,7 @@ import com.laboratorio.truthsocialapiinterface.TruthsocialStatusApi;
  * @author Rafael
  * @version 1.1
  * @created 24/07/2024
- * @updated 21/08/2024
+ * @updated 02/09/2024
  */
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -72,8 +72,11 @@ public class TruthsocialStatusApiTest {
     }
     
     @Test @Order(2)
-    public void deleteStatus() {
+    public void deleteStatus() throws InterruptedException {
         String text = "Hola, les saludo desde El laboratorio de Rafa. Post automático";
+        
+        // Esperar para que los cambios se reflejen en base de datos
+        Thread.sleep(2500);
         
         TruthsocialStatus status = this.statusApi.deleteStatus(idElim);
         assertTrue(!status.getId().isEmpty());
@@ -106,8 +109,11 @@ public class TruthsocialStatusApiTest {
     }
     
     @Test @Order(8)
-    public void deletePostImage() {
+    public void deletePostImage() throws InterruptedException {
         String text = "Hola, les saludo desde El laboratorio de Rafa. Post automático";
+        
+        // Esperar para que los cambios se reflejen en base de datos
+        Thread.sleep(2500);
         
         TruthsocialStatus status = this.statusApi.deleteStatus(idElim);
         assertTrue(!status.getId().isEmpty());
@@ -201,8 +207,11 @@ public class TruthsocialStatusApiTest {
     }
     
     @Test @Order(4)
-    public void unreblogStatus() {
+    public void unreblogStatus() throws InterruptedException {
         String id = "113060871346252247";
+        
+        // Esperar para que los cambios se reflejen en base de datos
+        Thread.sleep(2500);
         
         TruthsocialStatus status = this.statusApi.unreblogStatus(id);
         assertEquals(id, status.getId());
@@ -235,8 +244,11 @@ public class TruthsocialStatusApiTest {
     }
     
     @Test @Order(6)
-    public void unfavouriteStatus() {
+    public void unfavouriteStatus() throws InterruptedException {
         String id = "113060871346252247";
+        
+        // Esperar para que los cambios se reflejen en base de datos
+        Thread.sleep(2500);
         
         TruthsocialStatus status = this.statusApi.unfavouriteStatus(id);
         assertEquals(id, status.getId());

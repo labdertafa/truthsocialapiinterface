@@ -14,7 +14,7 @@ import com.laboratorio.truthsocialapiinterface.TruthsocialNotificationApi;
  * @author Rafael
  * @version 1.1
  * @created 25/07/2024
- * @updated 21/08/2024
+ * @updated 01/09/2024
  */
 public class TruthsocialNotificationApiTest {
     private String accessToken;

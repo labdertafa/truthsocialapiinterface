@@ -37,7 +37,7 @@ import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
  * @author Rafael
  * @version 1.1
  * @created 24/07/2024
- * @updated 01/09/2024
+ * @updated 02/09/2024
  */
 public class TruthsocialBaseApi {
     protected static final Logger log = LogManager.getLogger(TruthsocialBaseApi.class);
@@ -68,6 +68,20 @@ public class TruthsocialBaseApi {
         }
         
         return maxId;
+    }
+    
+    // Función que extrae el max_id de la respuesta
+    protected String extractMinId(String str) {
+        String minId = null;
+        String regex = "min_id=(\\d+)";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(str);
+        
+        if (matcher.find()) {
+            minId = matcher.group(1); // El primer grupo de captura contiene el valor de max_id
+        }
+        
+        return minId;
     }
     
     // Obtiene las cookies del website

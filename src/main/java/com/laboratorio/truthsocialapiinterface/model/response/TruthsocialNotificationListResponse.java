@@ -11,10 +11,11 @@ import lombok.Setter;
  * @author Rafael
  * @version 1.0
  * @created 25/07/2024
- * @updated 01/09/2024
+ * @updated 02/09/2024
  */
 @Getter @Setter @AllArgsConstructor
 public class TruthsocialNotificationListResponse {
     private String maxId;
+    private String minId;
     private List<TruthsocialNotification> notifications;
 }
