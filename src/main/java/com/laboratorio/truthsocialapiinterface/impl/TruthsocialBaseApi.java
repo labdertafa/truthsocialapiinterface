@@ -37,7 +37,7 @@ import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
  * @author Rafael
  * @version 1.1
  * @created 24/07/2024
- * @updated 02/09/2024
+ * @updated 04/09/2024
  */
 public class TruthsocialBaseApi {
     protected static final Logger log = LogManager.getLogger(TruthsocialBaseApi.class);
@@ -185,8 +185,8 @@ public class TruthsocialBaseApi {
                 throw new TruthsocialApiException(TruthsocialBaseApi.class.getName(), str);
             }
             
-            log.info("Se ejecutó la query: " + url);
-            log.info("Respuesta JSON recibida: " + jsonStr);
+            log.debug("Se ejecutó la query: " + url);
+            log.debug("Respuesta JSON recibida: " + jsonStr);
             
             Gson gson = new Gson();
             return gson.fromJson(jsonStr, new TypeToken<List<TruthsocialAccount>>(){}.getType());
@@ -229,13 +229,13 @@ public class TruthsocialBaseApi {
             List<TruthsocialAccount> accounts = gson.fromJson(jsonStr, new TypeToken<List<TruthsocialAccount>>(){}.getType());
             String maxId = null;
             if (!accounts.isEmpty()) {
-                log.info("Se ejecutó la query: " + url);
-                log.info("Resultados encontrados: " + accounts.size());
+                log.debug("Se ejecutó la query: " + url);
+                log.debug("Resultados encontrados: " + accounts.size());
 
                 String linkHeader = response.getHeaderString("link");
-                log.info("Recibí este link: " + linkHeader);
+                log.debug("Recibí este link: " + linkHeader);
                 maxId = this.extractMaxId(linkHeader);
-                log.info("Valor del max_id: " + maxId);
+                log.debug("Valor del max_id: " + maxId);
             }
 
             // return accounts;

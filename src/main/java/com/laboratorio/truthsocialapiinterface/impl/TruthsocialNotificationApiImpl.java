@@ -18,7 +18,7 @@ import com.laboratorio.truthsocialapiinterface.TruthsocialNotificationApi;
  * @author Rafael
  * @version 1.1
  * @created 25/07/2024
- * @updated 02/09/2024
+ * @updated 04/09/2024
  */
 public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implements TruthsocialNotificationApi {
     public TruthsocialNotificationApiImpl(String accessToken) {
@@ -70,7 +70,7 @@ public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implement
                 log.debug("Resultados encontrados: " + notifications.size());
 
                 String linkHeader = response.getHeaderString("link");
-                log.info("Recibí este link: " + linkHeader);
+                log.debug("Recibí este link: " + linkHeader);
                 minId = this.extractMinId(linkHeader);
                 log.debug("Valor del min_id: " + minId);
             }

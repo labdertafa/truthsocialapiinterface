@@ -30,7 +30,7 @@ import com.laboratorio.truthsocialapiinterface.model.response.TruthsocialAccount
  * @author Rafael
  * @version 1.1
  * @created 24/07/2024
- * @updated 01/09/2024
+ * @updated 04/09/2024
  */
 public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements TruthsocialStatusApi {
     public TruthsocialStatusApiImpl(String accessToken) {
@@ -146,8 +146,8 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
                 throw new TruthsocialApiException(TruthsocialAccountApiImpl.class.getName(), str);
             }
             
-            log.info("Se ejecutó la query: " + url);
-            log.info("Respuesta recibida: " + jsonStr);
+            log.debug("Se ejecutó la query: " + url);
+            log.debug("Respuesta recibida: " + jsonStr);
             
             Gson gson = new Gson();
             return gson.fromJson(jsonStr, TruthsocialMediaAttachment.class);
@@ -194,7 +194,7 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
             }
             
             log.debug("Se ejecutó la query: " + url);
-            log.info("Respuesta recibida: " + jsonStr);
+            log.debug("Respuesta recibida: " + jsonStr);
             
             Gson gson = new Gson();
             return gson.fromJson(jsonStr, TruthsocialStatus.class);
@@ -275,7 +275,7 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
             }
             
             log.debug("Se ejecutó la query: " + url);
-            log.info("Respuesta recibida: " + jsonStr);
+            log.debug("Respuesta recibida: " + jsonStr);
             
             Gson gson = new Gson();
             return gson.fromJson(jsonStr, TruthsocialStatus.class);

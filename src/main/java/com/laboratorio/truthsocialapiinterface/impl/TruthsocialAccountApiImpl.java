@@ -20,7 +20,7 @@ import com.laboratorio.truthsocialapiinterface.TruthsocialAccountApi;
  * @author Rafael
  * @version 1.1
  * @created 10/07/2024
- * @updated 01/09/2024
+ * @updated 04/09/2024
  */
 public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements TruthsocialAccountApi {
     public TruthsocialAccountApiImpl(String accessToken) {
@@ -48,7 +48,7 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
             }
             
             log.info("Se ejecutó la query: " + url);
-            log.info("Respuesta JSON recibida: " + jsonStr);
+            log.debug("Respuesta JSON recibida: " + jsonStr);
             
             Gson gson = new Gson();
             return gson.fromJson(jsonStr, TruthsocialAccount.class);
