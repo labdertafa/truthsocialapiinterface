@@ -1,6 +1,5 @@
 package com.laboratorio.truthsocialapiinterface.utils;
 
-import com.laboratorio.truthsocialapiinterface.impl.TruthsocialBaseApi;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -28,7 +27,7 @@ import org.apache.logging.log4j.Logger;
  * @updated 01/09/2024
  */
 public class CookieManager {
-    protected static final Logger log = LogManager.getLogger(TruthsocialBaseApi.class);
+    protected static final Logger log = LogManager.getLogger(CookieManager.class);
 
     private static void logException(Exception e) {
         log.error("Error: " + e.getMessage());

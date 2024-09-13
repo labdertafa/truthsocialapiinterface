@@ -6,7 +6,6 @@ import com.google.gson.reflect.TypeToken;
 import com.laboratorio.truthsocialapiinterface.exception.TruthsocialApiException;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialAccount;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialRelationship;
-import com.laboratorio.truthsocialapiinterface.model.response.TruthsocialFollowResponse;
 import java.util.List;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -20,7 +19,7 @@ import com.laboratorio.truthsocialapiinterface.TruthsocialAccountApi;
  * @author Rafael
  * @version 1.1
  * @created 10/07/2024
- * @updated 04/09/2024
+ * @updated 12/09/2024
  */
 public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements TruthsocialAccountApi {
     public TruthsocialAccountApiImpl(String accessToken) {
@@ -170,7 +169,7 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
             log.debug("Respuesta JSON recibida: " + jsonStr);
             
             Gson gson = new Gson();
-            TruthsocialFollowResponse followResponse = gson.fromJson(jsonStr, TruthsocialFollowResponse.class);
+            TruthsocialRelationship followResponse = gson.fromJson(jsonStr, TruthsocialRelationship.class);
             return followResponse.isFollowing();
         } catch (JsonSyntaxException e) {
             logException(e);
@@ -211,7 +210,7 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
             log.debug("Respuesta JSON recibida: " + jsonStr);
             
             Gson gson = new Gson();
-            TruthsocialFollowResponse followResponse = gson.fromJson(jsonStr, TruthsocialFollowResponse.class);
+            TruthsocialRelationship followResponse = gson.fromJson(jsonStr, TruthsocialRelationship.class);
             return !followResponse.isFollowing();
         } catch (JsonSyntaxException e) {
             logException(e);

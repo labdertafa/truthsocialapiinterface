@@ -15,7 +15,7 @@ import lombok.Setter;
  * @author Rafael
  * @version 1.0
  * @created 10/07/2024
- * @updated 01/09/2024
+ * @updated 13/09/2024
  */
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
@@ -60,20 +60,20 @@ public class TruthsocialAccount {
             return false;
         }
 
-        /* if (this.last_status_at == null) {
-            return false;
-        } */
-
-        LocalDate ultimaActividad;
-        try {
-            ultimaActividad = LocalDate.parse(this.last_status_at, DateTimeFormatter.ISO_DATE);
-        } catch (Exception e) {
-            return false;
+        if (this.last_status_at != null) {
+            LocalDate ultimaActividad;
+            try {
+                ultimaActividad = LocalDate.parse(this.last_status_at, DateTimeFormatter.ISO_DATE);
+            } catch (Exception e) {
+                return false;
+            }
+            TruthsocialApiConfig config = TruthsocialApiConfig.getInstance();
+            int maxInactividad = Integer.parseInt(config.getProperty("dias_inactividad_cuenta"));
+            long nDays = ChronoUnit.DAYS.between(ultimaActividad, LocalDate.now());
+            return Math.abs(nDays) <= maxInactividad;
         }
-        TruthsocialApiConfig config = TruthsocialApiConfig.getInstance();
-        int maxInactividad = Integer.parseInt(config.getProperty("dias_inactividad_cuenta"));
-        long nDays = ChronoUnit.DAYS.between(ultimaActividad, LocalDate.now());
-        return Math.abs(nDays) <= maxInactividad;
+        
+        return true;
     }
 
     public boolean isFuenteSeguidores() {
