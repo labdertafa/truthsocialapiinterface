@@ -1,24 +1,21 @@
 package com.laboratorio.truthsocialapiinterface.impl;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+import com.laboratorio.clientapilibrary.model.ApiRequest;
+import com.laboratorio.clientapilibrary.model.ProcessedResponse;
 import com.laboratorio.truthsocialapiinterface.exception.TruthsocialApiException;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialNotification;
 import com.laboratorio.truthsocialapiinterface.model.response.TruthsocialNotificationListResponse;
 import java.util.List;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
 import com.laboratorio.truthsocialapiinterface.TruthsocialNotificationApi;
 
 /**
  *
  * @author Rafael
- * @version 1.1
+ * @version 1.2
  * @created 25/07/2024
- * @updated 04/09/2024
+ * @updated 17/09/2024
  */
 public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implements TruthsocialNotificationApi {
     public TruthsocialNotificationApiImpl(String accessToken) {
@@ -41,35 +38,25 @@ public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implement
     }
     
     // Función que devuelve una página de notificaciones de una cuenta
-    private TruthsocialNotificationListResponse getNotificationPage(String url, int limit, int okStatus, String posicionInicial) throws Exception {
-        Client client = ClientBuilder.newClient();
-        Response response = null;
-        
+    private TruthsocialNotificationListResponse getNotificationPage(String uri, int limit, int okStatus, String posicionInicial) throws Exception {
         try {
-            WebTarget target = client.target(url)
-                        .queryParam("limit", limit);
+            ApiRequest request = new ApiRequest(uri, okStatus);
+            request.addApiPathParam("limit", Integer.toString(limit));
             if (posicionInicial != null) {
-                target = target.queryParam("min_id", posicionInicial);
+                request.addApiPathParam("min_id", posicionInicial);
             }
             
-            response = this.createRequest(client, target, url)
-                    .get();
+            request = this.addHeadersAndCookies(request, true);
             
-            String jsonStr = processResponse(response);
-            if (response.getStatus() != okStatus) {
-                log.error(String.format("Respuesta del error %d: %s", response.getStatus(), jsonStr));
-                String str = "Error ejecutando: " + url + ". Se obtuvo el código de error: " + response.getStatus();
-                throw new TruthsocialApiException(TruthsocialNotificationApiImpl.class.getName(), str);
-            }
+            ProcessedResponse response = this.client.getProcessedResponseGetRequest(request);
             
-            Gson gson = new Gson();
             String minId = posicionInicial;
-            List<TruthsocialNotification> notifications = gson.fromJson(jsonStr, new TypeToken<List<TruthsocialNotification>>(){}.getType());
+            List<TruthsocialNotification> notifications = gson.fromJson(response.getResponseDetail(), new TypeToken<List<TruthsocialNotification>>(){}.getType());
             if (!notifications.isEmpty()) {
-                log.debug("Se ejecutó la query: " + url);
+                log.debug("Se ejecutó la query: " + uri);
                 log.debug("Resultados encontrados: " + notifications.size());
 
-                String linkHeader = response.getHeaderString("link");
+                String linkHeader = response.getResponse().getHeaderString("link");
                 log.debug("Recibí este link: " + linkHeader);
                 minId = this.extractMinId(linkHeader);
                 log.debug("Valor del min_id: " + minId);
@@ -80,13 +67,8 @@ public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implement
         } catch (JsonSyntaxException e) {
             logException(e);
             throw e;
-        } catch (TruthsocialApiException e) {
-            throw e;
-        } finally {
-            if (response != null) {
-                response.close();
-            }
-            client.close();
+        } catch (Exception e) {
+            throw new TruthsocialApiException(TruthsocialNotificationApiImpl.class.getName(), e.getMessage());
         }
     }
 

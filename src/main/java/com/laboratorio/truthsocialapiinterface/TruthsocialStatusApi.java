@@ -10,7 +10,7 @@ import java.util.List;
  * @author Rafael
  * @version 1.1
  * @created 24/07/2024
- * @updated 01/09/2024
+ * @updated 16/09/2024
  */
 public interface TruthsocialStatusApi {
     // Consultar un status por su id
@@ -19,10 +19,11 @@ public interface TruthsocialStatusApi {
     // Postear o eliminar un status.
     TruthsocialStatus postStatus(String text);
     TruthsocialStatus deleteStatus(String id);
+    TruthsocialStatus postStatusWithImage(String text, TruthsocialMediaAttachment mediaAttachment);
+    TruthsocialStatus postStatus(String text, String filePath);
     
-    // Postear un status con imagen
+    // Subir una imagen
     TruthsocialMediaAttachment uploadImage(String filePath) throws Exception;
-    TruthsocialStatus postStatus(String text, String imagenId);
     
     // Ver las cuentas que han impulsado o marcado como favorito un status
     List<TruthsocialAccount> getRebloggedBy(String id) throws Exception;

@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.laboratorio</groupId>
     <artifactId>truthsocialapiinterface</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
     <packaging>jar</packaging>
     <name>TruthSocial-Api-Interface</name>
     <description>Librería que ejecutar las API de la red social Truth Social</description>
@@ -38,7 +38,21 @@
         </repository>
     </distributionManagement>
     
+    <repositories>
+        <repository>
+            <id>github_00</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/labdertafa/clientapilibrary/</url>
+        </repository>
+    </repositories>
+    
     <dependencies>
+        <dependency>
+            <groupId>com.laboratorio</groupId>
+            <artifactId>clientapilibrary</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+        
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

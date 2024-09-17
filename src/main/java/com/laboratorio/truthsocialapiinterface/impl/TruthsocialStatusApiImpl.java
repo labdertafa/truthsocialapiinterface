@@ -1,36 +1,22 @@
 package com.laboratorio.truthsocialapiinterface.impl;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.laboratorio.clientapilibrary.model.ApiRequest;
 import com.laboratorio.truthsocialapiinterface.exception.TruthsocialApiException;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialAccount;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialMediaAttachment;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialStatus;
 import com.laboratorio.truthsocialapiinterface.utils.InstruccionInfo;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.List;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.jaxrs.ResteasyClient;
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataWriter;
 import com.laboratorio.truthsocialapiinterface.TruthsocialStatusApi;
 import com.laboratorio.truthsocialapiinterface.model.response.TruthsocialAccountListResponse;
 
 /**
  *
  * @author Rafael
- * @version 1.1
+ * @version 1.2
  * @created 24/07/2024
- * @updated 04/09/2024
+ * @updated 17/09/2024
  */
 public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements TruthsocialStatusApi {
     public TruthsocialStatusApiImpl(String accessToken) {
@@ -39,39 +25,23 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
     
     @Override
     public TruthsocialStatus getStatusById(String id) {
-        Client client = ClientBuilder.newClient();
-        Response response = null;
         String endpoint = this.apiConfig.getProperty("getStatusById_endpoint");
         int okStatus = Integer.parseInt(this.apiConfig.getProperty("getStatusById_ok_status"));
         
         try {
-            String url = endpoint + "/" + id;
-            WebTarget target = client.target(url);
+            String uri = endpoint + "/" + id;
+            ApiRequest request = new ApiRequest(uri, okStatus);
             
-            response = this.createRequest(client, target, url).get();
+            request = this.addHeadersAndCookies(request, false);
             
-            String jsonStr = processResponse(response);
-            if (response.getStatus() != okStatus) {
-                log.error(String.format("Respuesta del error %d: %s", response.getStatus(), jsonStr));
-                String str = "Error ejecutando: " + url + ". Se obtuvo el código de error: " + response.getStatus();
-                throw new TruthsocialApiException(TruthsocialAccountApiImpl.class.getName(), str);
-            }
-            
-            log.debug("Se ejecutó la query: " + url);
-            log.debug("Respuesta JSON recibida: " + jsonStr);
-            
-            Gson gson = new Gson();
-            return gson.fromJson(jsonStr, TruthsocialStatus.class);
+            String jsonStr = this.client.executeGetRequest(request);
+
+            return this.gson.fromJson(jsonStr, TruthsocialStatus.class);
         } catch (JsonSyntaxException e) {
             logException(e);
             throw e;
-        } catch (TruthsocialApiException e) {
-            throw e;
-        } finally {
-            if (response != null) {
-                response.close();
-            }
-            client.close();
+        } catch (Exception e) {
+            throw new TruthsocialApiException(TruthsocialStatusApiImpl.class.getName(), e.getMessage());
         }
     }
 
@@ -82,132 +52,92 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
 
     @Override
     public TruthsocialStatus deleteStatus(String id) {
-        Client client = ClientBuilder.newClient();
-        Response response = null;
         String endpoint = this.apiConfig.getProperty("deleteStatus_endpoint");
         int okStatus = Integer.parseInt(this.apiConfig.getProperty("deleteStatus_ok_status"));
         
         try {
-            String url = endpoint + "/" + id;
-            WebTarget target = client.target(url);
+            String uri = endpoint + "/" + id;
+            ApiRequest request = new ApiRequest(uri, okStatus);
             
+            request = this.addHeadersAndCookies(request, true);
             
-            response = this.createRequest(client, target, url)
-                    .delete();
-            
-            String jsonStr = processResponse(response);
-            if (response.getStatus() != okStatus) {
-                log.error(String.format("Respuesta del error %d: %s", response.getStatus(), jsonStr));
-                String str = "Error ejecutando: " + url + ". Se obtuvo el código de error: " + response.getStatus();
-                throw new TruthsocialApiException(TruthsocialAccountApiImpl.class.getName(), str);
-            }
-            
-            log.debug("Se ejecutó la query: " + url);
-            
-            Gson gson = new Gson();
-            return gson.fromJson(jsonStr, TruthsocialStatus.class);
+            String jsonStr = this.client.executeDeleteRequest(request);
+
+            return this.gson.fromJson(jsonStr, TruthsocialStatus.class);
         } catch (JsonSyntaxException e) {
             logException(e);
             throw  e;
-        } catch (TruthsocialApiException e) {
-            throw  e;
-        } finally {
-            if (response != null) {
-                response.close();
+        } catch (Exception e) {
+            throw new TruthsocialApiException(TruthsocialStatusApiImpl.class.getName(), e.getMessage());
+        }
+    }
+    
+    @Override
+    public TruthsocialStatus postStatusWithImage(String text, TruthsocialMediaAttachment mediaAttachment) {
+        String endpoint = this.apiConfig.getProperty("postStatus_endpoint");
+        int okStatus = Integer.parseInt(this.apiConfig.getProperty("postStatus_ok_status"));
+        
+        try {
+            String uri = endpoint;
+            ApiRequest request = new ApiRequest(uri, okStatus);
+            request.addApiPathParam("status", text);
+            request.addApiPathParam("visibility", "public");
+            request.addApiPathParam("language", "es");
+            if (mediaAttachment != null) {
+                request.addApiPathParam("media_ids[]", mediaAttachment.getId());
             }
-            client.close();
+            
+            request = this.addHeadersAndCookies(request, true);
+            
+            String jsonStr = this.client.executePostRequest(request);
+            
+            return this.gson.fromJson(jsonStr, TruthsocialStatus.class);
+        } catch (JsonSyntaxException e) {
+            logException(e);
+            throw  e;
+        } catch (Exception e) {
+            throw new TruthsocialApiException(TruthsocialStatusApiImpl.class.getName(), e.getMessage());
+        }
+    }
+    
+    @Override
+    public TruthsocialStatus postStatus(String text, String filePath) {
+        try {
+            if (filePath != null) {
+                TruthsocialMediaAttachment mediaAttachment = this.uploadImage(filePath);
+                Thread.sleep(2500);
+                return this.postStatusWithImage(text, mediaAttachment);
+            }
+            
+            return this.postStatusWithImage(text, null);
+        } catch (JsonSyntaxException e) {
+            logException(e);
+            throw  e;
+        } catch (Exception e) {
+            throw new TruthsocialApiException(TruthsocialStatusApiImpl.class.getName(), e.getMessage());
         }
     }
     
     @Override
     public TruthsocialMediaAttachment uploadImage(String filePath) throws Exception {
-        ResteasyClient client = (ResteasyClient)ResteasyClientBuilder.newBuilder().build();
-        Response response = null;
         String endpoint = this.apiConfig.getProperty("UploadImage_endpoint");
         int okStatus = Integer.parseInt(this.apiConfig.getProperty("UploadImage_ok_status"));
         
         try {
-            String url = endpoint;
-            WebTarget target = client.target(url)
-                    .register(MultipartFormDataWriter.class);
+            String uri = endpoint;
+            ApiRequest request = new ApiRequest(uri, okStatus);
             
-            MultipartFormDataOutput formDataOutput = new MultipartFormDataOutput();
-            File imageFile = new File(filePath);
-            InputStream fileStream = new FileInputStream(imageFile);
-            formDataOutput.addFormData("file", fileStream, MediaType.APPLICATION_OCTET_STREAM_TYPE, imageFile.getName());
+            request = this.addHeadersAndCookies(request, true);
+            request.addFileFormData("file", filePath);
             
-            response = this.createRequest(client, target, url)
-                    .post(Entity.entity(formDataOutput, MediaType.MULTIPART_FORM_DATA));
+            String jsonStr = this.client.executePostRequest(request);
             
-            String jsonStr = processResponse(response);
-            if (response.getStatus() != okStatus) {
-                log.error(String.format("Respuesta del error %d. Detalle: %s", response.getStatus(), jsonStr));
-                String str = "Error ejecutando: " + url + ". Se obtuvo el código de error: " + response.getStatus();
-                throw new TruthsocialApiException(TruthsocialAccountApiImpl.class.getName(), str);
-            }
-            
-            log.debug("Se ejecutó la query: " + url);
-            log.debug("Respuesta recibida: " + jsonStr);
-            
-            Gson gson = new Gson();
-            return gson.fromJson(jsonStr, TruthsocialMediaAttachment.class);
-        } catch (JsonSyntaxException | FileNotFoundException e) {
-            logException(e);
-            throw  e;
-        } catch (TruthsocialApiException e) {
-            throw  e;
-        } finally {
-            if (response != null) {
-                response.close();
-            }
-            client.close();
-        }
-    }
-    
-    @Override
-    public TruthsocialStatus postStatus(String text, String imagenId) {
-        Client client = ClientBuilder.newClient();
-        Response response = null;
-        String endpoint = this.apiConfig.getProperty("postStatus_endpoint");
-        int okStatus = Integer.parseInt(this.apiConfig.getProperty("postStatus_ok_status"));
-        
-        try {
-            String url = endpoint;
-            WebTarget target = client.target(url)
-                    .queryParam("status", text)
-                    .queryParam("visibility", "public")
-                    .queryParam("language", "es");
-            
-            if (imagenId != null) {
-                target = target.queryParam("media_ids[]", imagenId);
-            }
-            
-            
-            response = this.createRequest(client, target, url)
-                    .post(Entity.text(""));
-            
-            String jsonStr = processResponse(response);
-            if (response.getStatus() != okStatus) {
-                log.error(String.format("Respuesta del error %d: %s", response.getStatus(), jsonStr));
-                String str = "Error ejecutando: " + url + ". Se obtuvo el código de error: " + response.getStatus();
-                throw new TruthsocialApiException(TruthsocialAccountApiImpl.class.getName(), str);
-            }
-            
-            log.debug("Se ejecutó la query: " + url);
-            log.debug("Respuesta recibida: " + jsonStr);
-            
-            Gson gson = new Gson();
-            return gson.fromJson(jsonStr, TruthsocialStatus.class);
+            return this.gson.fromJson(jsonStr, TruthsocialMediaAttachment.class);
         } catch (JsonSyntaxException e) {
             logException(e);
             throw  e;
-        } catch (TruthsocialApiException e) {
-            throw  e;
-        } finally {
-            if (response != null) {
-                response.close();
-            }
-            client.close();
+        } catch (Exception e) {
+            throw new TruthsocialApiException(TruthsocialStatusApiImpl.class.getName(), e.getMessage());
         }
     }
     
@@ -254,41 +184,23 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
         limit = Math.min(limit, quantity);
         String url = endpoint + "/" + id + "/" + complementoUrl;
         
-        return this.getUserList(url, id, limit, okStatus);
+        return this.getUserList(url, limit, okStatus);
     }
     
-    private TruthsocialStatus executeSimplePost(String url, int okStatus) {
-        Client client = ClientBuilder.newClient();
-        Response response = null;
-        
+    private TruthsocialStatus executeSimplePost(String uri, int okStatus) {
         try {
-            WebTarget target = client.target(url);
+            ApiRequest request = new ApiRequest(uri, okStatus);
             
-            response = this.createRequest(client, target, url)
-                    .post(Entity.text(""));
+            request = this.addHeadersAndCookies(request, true);
             
-            String jsonStr = processResponse(response);
-            if (response.getStatus() != okStatus) {
-                log.error(String.format("Respuesta del error %d: %s", response.getStatus(), jsonStr));
-                String str = "Error ejecutando: " + url + ". Se obtuvo el código de error: " + response.getStatus();
-                throw new TruthsocialApiException(TruthsocialAccountApiImpl.class.getName(), str);
-            }
+            String jsonStr = this.client.executePostRequest(request);
             
-            log.debug("Se ejecutó la query: " + url);
-            log.debug("Respuesta recibida: " + jsonStr);
-            
-            Gson gson = new Gson();
-            return gson.fromJson(jsonStr, TruthsocialStatus.class);
+            return this.gson.fromJson(jsonStr, TruthsocialStatus.class);
         } catch (JsonSyntaxException e) {
             logException(e);
             throw  e;
-        } catch (TruthsocialApiException e) {
-            throw  e;
-        } finally {
-            if (response != null) {
-                response.close();
-            }
-            client.close();
+        } catch (Exception e) {
+            throw new TruthsocialApiException(TruthsocialStatusApiImpl.class.getName(), e.getMessage());
         }
     }
 

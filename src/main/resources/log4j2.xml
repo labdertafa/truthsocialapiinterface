@@ -7,7 +7,7 @@
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </Console>
         
-        <RollingFile name="RollingFile" fileName="logs/MastodonApiInterface.log" filePattern="socialimprove/logs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz">
+        <RollingFile name="RollingFile" fileName="socialimprove/logs/MastodonApiInterface.log" filePattern="socialimprove/logs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz">
             <PatternLayout pattern="%d{yyyy-MM-dd 'at' HH:mm:ss z} %-5level %class{36} - %msg%xEx%n" />
             <TimeBasedTriggeringPolicy interval="1" />
             <DefaultRolloverStrategy>

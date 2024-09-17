@@ -9,7 +9,7 @@ import java.util.List;
  * @author Rafael
  * @version 1.1
  * @created 10/07/2024
- * @updated 01/09/2024
+ * @updated 16/09/2024
  */
 public interface TruthsocialAccountApi {
     // Obtiene la información de un usuario a partir de su ID
@@ -28,4 +28,7 @@ public interface TruthsocialAccountApi {
     boolean unfollowAccount(String id);
     // Chequea la relación con un listado de cuentas identificadas por su id
     List<TruthsocialRelationship> checkrelationships(List<String> ids);
+    // Consultar las sugerencias de seguimiento
+    List<TruthsocialAccount> getSuggestions();
+    List<TruthsocialAccount> getSuggestions(int limit);
 }

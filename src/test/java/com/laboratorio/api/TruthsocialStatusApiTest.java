@@ -3,7 +3,6 @@ package com.laboratorio.api;
 import com.laboratorio.truthsocialapiinterface.exception.TruthsocialApiException;
 import com.laboratorio.truthsocialapiinterface.impl.TruthsocialStatusApiImpl;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialAccount;
-import com.laboratorio.truthsocialapiinterface.model.TruthsocialMediaAttachment;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialStatus;
 import com.laboratorio.truthsocialapiinterface.utils.TruthsocialApiConfig;
 import java.util.List;
@@ -20,7 +19,7 @@ import com.laboratorio.truthsocialapiinterface.TruthsocialStatusApi;
  * @author Rafael
  * @version 1.1
  * @created 24/07/2024
- * @updated 02/09/2024
+ * @updated 16/09/2024
  */
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -97,12 +96,7 @@ public class TruthsocialStatusApiTest {
         String imagen = "C:\\Users\\rafa\\Pictures\\Formula_1\\Spa_1950.jpg";
         String text = "Hola, les saludo desde El laboratorio de Rafa. Post automático";
         
-        TruthsocialMediaAttachment media = this.statusApi.uploadImage(imagen);
-        assertTrue(media.getPreview_url() != null);
-        
-        Thread.sleep(2500);
-        
-        TruthsocialStatus status = this.statusApi.postStatus(text, media.getId());
+        TruthsocialStatus status = this.statusApi.postStatus(text, imagen);
         idElim = status.getId();
         assertTrue(!status.getId().isEmpty());
         assertTrue(status.getContent().contains(text));

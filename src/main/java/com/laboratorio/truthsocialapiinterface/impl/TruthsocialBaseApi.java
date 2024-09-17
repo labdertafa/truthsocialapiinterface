@@ -3,56 +3,46 @@ package com.laboratorio.truthsocialapiinterface.impl;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+import com.laboratorio.clientapilibrary.ApiClient;
+import com.laboratorio.clientapilibrary.impl.ApiClientImpl;
+import com.laboratorio.clientapilibrary.model.ApiRequest;
+import com.laboratorio.clientapilibrary.model.ProcessedResponse;
 import com.laboratorio.truthsocialapiinterface.exception.TruthsocialApiException;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialAccount;
 import com.laboratorio.truthsocialapiinterface.model.response.TruthsocialAccountListResponse;
-import com.laboratorio.truthsocialapiinterface.utils.CookieManager;
 import com.laboratorio.truthsocialapiinterface.utils.InstruccionInfo;
 import com.laboratorio.truthsocialapiinterface.utils.TruthsocialApiConfig;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.NewCookie;
-import javax.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jboss.resteasy.client.jaxrs.ResteasyClient;
-import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
-import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 
 /**
  *
  * @author Rafael
- * @version 1.1
+ * @version 1.2
  * @created 24/07/2024
- * @updated 04/09/2024
+ * @updated 17/09/2024
  */
 public class TruthsocialBaseApi {
     protected static final Logger log = LogManager.getLogger(TruthsocialBaseApi.class);
+    protected final ApiClient client;
     protected final String accessToken;
     protected TruthsocialApiConfig apiConfig;
+    protected final Gson gson;
 
     public TruthsocialBaseApi(String accessToken) {
+        this.client = new ApiClientImpl();
         this.accessToken = accessToken;
         this.apiConfig = TruthsocialApiConfig.getInstance();
+           this.gson = new Gson();
     }
     
     protected void logException(Exception e) {
         log.error("Error: " + e.getMessage());
         if (e.getCause() != null) {
-            log.error("Causa: " + e.getMessage());
+            log.error("Causa: " + e.getCause().getMessage());
         }
     }
     
@@ -84,155 +74,68 @@ public class TruthsocialBaseApi {
         return minId;
     }
     
-    // Obtiene las cookies del website
-    public List<String> getWebsiteCookies() {
-        // Cargar las cookies almacenadas si existen
-        Map<String, NewCookie> existingCookies = CookieManager.loadCookies();
-        if (!existingCookies.isEmpty()) {
-            return CookieManager.extractCookiesInformation(existingCookies);
-        }
-        
-        ResteasyClient client = new ResteasyClientBuilderImpl()
-                .enableCookieManagement()
-                .build();
-        Response response = null;
-        
+    protected ApiRequest addHeadersAndCookies(ApiRequest request, boolean needAuthorization) {
         try {
-            // Realiza una primera solicitud para obtener las cookies
-            String initialUrl = "https://truthsocial.com";
-            ResteasyWebTarget target = client.target(initialUrl);
-            response = target.request().get();
+            List<String> cookiesList = this.client.getWebsiteCookies("https://truthsocial.com");
 
-            return CookieManager.extractCookiesInformation(response.getCookies());
-        } catch (Exception e) {
-            logException(e);
-            throw e;
-        } finally {
-            if (response != null) {
-                response.close();
+            request.addApiHeader("Content-Type", "application/json");
+            if (needAuthorization) {
+                request.addApiHeader("Authorization", "Bearer " + this.accessToken);
             }
-            client.close();
-        }
-    }
-    
-    // Crea la HTTP request
-    protected Invocation.Builder createRequest(Client client, WebTarget target, String url) {
-        try {
-            List<String> cookiesList = this.getWebsiteCookies();
-
-            Invocation.Builder requestBuilder = target.request(MediaType.APPLICATION_JSON);
-            requestBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken);
-            requestBuilder.header("User-Agent", "PostmanRuntime/7.41.2");
-            requestBuilder.header("Accept", "*/*");
-            requestBuilder.header("Accept-Encoding", "gzip, deflate, br");
-            requestBuilder.header("Connection", "keep-alive");
-
+            request.addApiHeader("User-Agent", "PostmanRuntime/7.41.2");
+            request.addApiHeader("Accept", "*/*");
+            request.addApiHeader("Accept-Encoding", "gzip, deflate, br");
+            request.addApiHeader("Connection", "keep-alive");
+            
             for (String cookie : cookiesList) {
-                requestBuilder.cookie(Cookie.valueOf(cookie));
+                request.addApiCookie(cookie);
             }
 
-            return requestBuilder;
+            return request;
         } catch (Exception e) {
             logException(e);
             throw e;
         }
     }
     
-    // Procesar la respuesta HTTP
-    protected String processResponse(Response response) {
+    protected List<TruthsocialAccount> getUserList(String uri, int limit, int okStatus) throws Exception {
         try {
-            // Obtén el InputStream de la entidad y descomprímelo si es necesario
-            InputStream inputStream = response.readEntity(InputStream.class);
-            String contentEncoding = response.getHeaderString("Content-Encoding");
-            // Verifica si la respuesta está comprimida
-            if ("gzip".equalsIgnoreCase(contentEncoding)) {
-                inputStream = new GZIPInputStream(inputStream);
-            }
+            ApiRequest request = new ApiRequest(uri, okStatus);
+            request.addApiPathParam("limit", Integer.toString(limit));
             
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuilder responseStrBuilder = new StringBuilder();
+            request = this.addHeadersAndCookies(request, true);
             
-            String line;
-            while ((line = reader.readLine()) != null) {
-                responseStrBuilder.append(line);
-            }
+            String jsonStr = this.client.executeGetRequest(request);
 
-            reader.close();
-            
-            // Almacena las cookies de la respuesta
-            CookieManager.saveCookies(response.getCookies());
-            
-            return responseStrBuilder.toString();
-        } catch (Exception e) {
-            throw new TruthsocialApiException(TruthsocialBaseApi.class.getName(), "Error descomprimiendo la respuesta recibida");
-        }
-    }
-    
-    protected List<TruthsocialAccount> getUserList(String url, String id, int limit, int okStatus) throws Exception {
-        Client client = ClientBuilder.newClient();
-        Response response = null;
-        
-        try {
-            WebTarget target = client.target(url)
-                        .queryParam("limit", limit);
-            
-            response = this.createRequest(client, target, url).get();
-            
-            String jsonStr = processResponse(response);
-            if (response.getStatus() != okStatus) {
-                log.error(String.format("Respuesta del error %d: %s", response.getStatus(), jsonStr));
-                String str = "Error ejecutando: " + url + ". Se obtuvo el código de error: " + response.getStatus();
-                throw new TruthsocialApiException(TruthsocialBaseApi.class.getName(), str);
-            }
-            
-            log.debug("Se ejecutó la query: " + url);
-            log.debug("Respuesta JSON recibida: " + jsonStr);
-            
-            Gson gson = new Gson();
-            return gson.fromJson(jsonStr, new TypeToken<List<TruthsocialAccount>>(){}.getType());
+            return this.gson.fromJson(jsonStr, new TypeToken<List<TruthsocialAccount>>(){}.getType());
         } catch (JsonSyntaxException e) {
             logException(e);
             throw e;
-        } catch (TruthsocialApiException e) {
-            throw e;
-        } finally {
-            if (response != null) {
-                response.close();
-            }
-            client.close();
+        } catch (Exception e) {
+            throw new TruthsocialApiException(TruthsocialBaseApi.class.getName(), e.getMessage());
         }
     }
     
     // Función que devuelve una página de seguidores o seguidos de una cuenta
-    private TruthsocialAccountListResponse getAccountPage(String endpoint, String complemento, int okStatus, String id, int limit, String posicionInicial) throws Exception {
-        Client client = ClientBuilder.newClient();
-        Response response = null;
-        
+    private TruthsocialAccountListResponse getAccountPage(String uri, int okStatus, int limit, String posicionInicial) throws Exception {
         try {
-            String url = endpoint + "/" + id + "/" + complemento;
-            WebTarget target = client.target(url)
-                        .queryParam("limit", limit);
+            ApiRequest request = new ApiRequest(uri, okStatus);
+            request.addApiPathParam("limit", Integer.toString(limit));
             if (posicionInicial != null) {
-                target = target.queryParam("max_id", posicionInicial);
+                request.addApiPathParam("max_id", posicionInicial);
             }
             
-            response = this.createRequest(client, target, url).get();
+            request = this.addHeadersAndCookies(request, true);
             
-            String jsonStr = processResponse(response);
-            if (response.getStatus() != okStatus) {
-                log.error(String.format("Respuesta del error %d: %s", response.getStatus(), jsonStr));
-                String str = "Error ejecutando: " + url + ". Se obtuvo el código de error: " + response.getStatus();
-                throw new TruthsocialApiException(TruthsocialBaseApi.class.getName(), str);
-            }
+            ProcessedResponse response = this.client.getProcessedResponseGetRequest(request);
             
-            Gson gson = new Gson();
-            List<TruthsocialAccount> accounts = gson.fromJson(jsonStr, new TypeToken<List<TruthsocialAccount>>(){}.getType());
+            List<TruthsocialAccount> accounts = this.gson.fromJson(response.getResponseDetail(), new TypeToken<List<TruthsocialAccount>>(){}.getType());
             String maxId = null;
             if (!accounts.isEmpty()) {
-                log.debug("Se ejecutó la query: " + url);
+                log.debug("Se ejecutó la query: " + uri);
                 log.debug("Resultados encontrados: " + accounts.size());
 
-                String linkHeader = response.getHeaderString("link");
+                String linkHeader = response.getResponse().getHeaderString("link");
                 log.debug("Recibí este link: " + linkHeader);
                 maxId = this.extractMaxId(linkHeader);
                 log.debug("Valor del max_id: " + maxId);
@@ -243,13 +146,8 @@ public class TruthsocialBaseApi {
         } catch (JsonSyntaxException e) {
             logException(e);
             throw e;
-        } catch (TruthsocialApiException e) {
-            throw e;
-        } finally {
-            if (response != null) {
-                response.close();
-            }
-            client.close();
+        } catch (Exception e) {
+            throw new TruthsocialApiException(TruthsocialBaseApi.class.getName(), e.getMessage());
         }
     }
     
@@ -267,8 +165,10 @@ public class TruthsocialBaseApi {
         }
         
         try {
+            String uri = endpoint + "/" + id + "/" + complemento;
+            
             do {
-                TruthsocialAccountListResponse accountListResponse = this.getAccountPage(endpoint, complemento, okStatus, id, limit, max_id);
+                TruthsocialAccountListResponse accountListResponse = this.getAccountPage(uri, okStatus, limit, max_id);
                 if (accounts == null) {
                     accounts = accountListResponse.getAccounts();
                 } else {
