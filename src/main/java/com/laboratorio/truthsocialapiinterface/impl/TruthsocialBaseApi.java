@@ -23,7 +23,7 @@ import org.apache.logging.log4j.Logger;
  * @author Rafael
  * @version 1.2
  * @created 24/07/2024
- * @updated 17/09/2024
+ * @updated 18/09/2024
  */
 public class TruthsocialBaseApi {
     protected static final Logger log = LogManager.getLogger(TruthsocialBaseApi.class);
@@ -33,10 +33,11 @@ public class TruthsocialBaseApi {
     protected final Gson gson;
 
     public TruthsocialBaseApi(String accessToken) {
-        this.client = new ApiClientImpl();
-        this.accessToken = accessToken;
         this.apiConfig = TruthsocialApiConfig.getInstance();
-           this.gson = new Gson();
+        String cookiesFilePath = this.apiConfig.getProperty("cookies_file");
+        this.client = new ApiClientImpl(cookiesFilePath);
+        this.accessToken = accessToken;
+        this.gson = new Gson();
     }
     
     protected void logException(Exception e) {
@@ -76,7 +77,8 @@ public class TruthsocialBaseApi {
     
     protected ApiRequest addHeadersAndCookies(ApiRequest request, boolean needAuthorization) {
         try {
-            List<String> cookiesList = this.client.getWebsiteCookies("https://truthsocial.com");
+            String website = this.apiConfig.getProperty("truthsocial_website");
+            List<String> cookiesList = this.client.getWebsiteCookies(website);
 
             request.addApiHeader("Content-Type", "application/json");
             if (needAuthorization) {
@@ -94,7 +96,7 @@ public class TruthsocialBaseApi {
             return request;
         } catch (Exception e) {
             logException(e);
-            throw e;
+            throw new TruthsocialApiException(TruthsocialBaseApi.class.getName(), e.getMessage());
         }
     }
     
