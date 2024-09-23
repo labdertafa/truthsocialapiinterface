@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.laboratorio</groupId>
     <artifactId>truthsocialapiinterface</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
     <packaging>jar</packaging>
     <name>TruthSocial-Api-Interface</name>
     <description>Librería que ejecutar las API de la red social Truth Social</description>
@@ -50,7 +50,7 @@
         <dependency>
             <groupId>com.laboratorio</groupId>
             <artifactId>clientapilibrary</artifactId>
-            <version>1.0.6</version>
+            <version>1.0.11</version>
         </dependency>
         
         <dependency>
@@ -58,27 +58,6 @@
             <artifactId>lombok</artifactId>
             <version>1.18.34</version>
             <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-client</artifactId>
-            <version>4.7.6.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-multipart-provider</artifactId>
-            <version>4.7.6.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jackson2-provider</artifactId>
-            <version>4.7.6.Final</version>
         </dependency>
         
         <dependency>
