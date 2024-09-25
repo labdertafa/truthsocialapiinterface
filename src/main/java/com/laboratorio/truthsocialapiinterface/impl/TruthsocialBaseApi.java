@@ -178,7 +178,7 @@ public class TruthsocialBaseApi {
                 }
                 
                 max_id = accountListResponse.getMaxId();
-                log.info("getTruthsocialAccountList. Cantidad: " + quantity + ". Recuperados: " + accounts.size() + ". Max_id: " + max_id);
+                log.debug("getTruthsocialAccountList. Cantidad: " + quantity + ". Recuperados: " + accounts.size() + ". Max_id: " + max_id);
                 if (quantity > 0) {
                     if ((accounts.size() >= quantity) || (max_id == null)) {
                         continuar = false;
