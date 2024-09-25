@@ -15,7 +15,7 @@ import com.laboratorio.truthsocialapiinterface.TruthsocialNotificationApi;
  * @author Rafael
  * @version 1.2
  * @created 25/07/2024
- * @updated 17/09/2024
+ * @updated 25/09/2024
  */
 public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implements TruthsocialNotificationApi {
     public TruthsocialNotificationApiImpl(String accessToken) {
@@ -100,7 +100,7 @@ public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implement
                 }
                 
                 min_id = notificationListResponse.getMinId();
-                log.info("getAllNotifications. Cantidad: " + quantity + ". Recuperados: " + notifications.size() + ". Min_id: " + min_id);
+                log.debug("getAllNotifications. Cantidad: " + quantity + ". Recuperados: " + notifications.size() + ". Min_id: " + min_id);
                 if (notificationListResponse.getNotifications().isEmpty()) {
                     continuar = false;
                 } else {
