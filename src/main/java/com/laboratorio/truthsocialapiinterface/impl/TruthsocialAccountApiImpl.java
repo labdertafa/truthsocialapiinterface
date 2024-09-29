@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * @author Rafael
  * @version 1.2
  * @created 10/07/2024
- * @updated 17/09/2024
+ * @updated 29/09/2024
  */
 public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements TruthsocialAccountApi {
     public TruthsocialAccountApiImpl(String accessToken) {
@@ -197,6 +197,8 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
         try {
             String uri = endpoint;
             ApiRequest request = new ApiRequest(uri, okStatus);
+            request.addApiPathParam("max_id", "81");
+            request.addApiPathParam("page", "2");
             request.addApiPathParam("limit", Integer.toString(usedLimit));
          
             request = this.addHeadersAndCookies(request, true);
@@ -210,6 +212,26 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
         } catch (JsonSyntaxException e) {
             logException(e);
             throw e;
+        } catch (Exception e) {
+            throw new TruthsocialApiException(TruthsocialAccountApiImpl.class.getName(), e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean deleteSuggestion(String userId) {
+        String endpoint = this.apiConfig.getProperty("deleteSuggestion_endpoint");
+        int okStatus = Integer.parseInt(this.apiConfig.getProperty("deleteSuggestion_ok_status"));
+        
+        try {
+            String uri = endpoint + "/" + userId;
+            ApiRequest request = new ApiRequest(uri, okStatus);
+         
+            request.addApiHeader("Content-Type", "application/json");
+            request.addApiHeader("Authorization", "Bearer " + this.accessToken);
+            
+            this.client.executeDeleteRequest(request);
+            
+            return true;
         } catch (Exception e) {
             throw new TruthsocialApiException(TruthsocialAccountApiImpl.class.getName(), e.getMessage());
         }

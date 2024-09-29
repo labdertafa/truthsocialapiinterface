@@ -31,4 +31,6 @@ public interface TruthsocialAccountApi {
     // Consultar las sugerencias de seguimiento
     List<TruthsocialAccount> getSuggestions();
     List<TruthsocialAccount> getSuggestions(int limit);
+    
+    boolean deleteSuggestion(String userId);
 }
