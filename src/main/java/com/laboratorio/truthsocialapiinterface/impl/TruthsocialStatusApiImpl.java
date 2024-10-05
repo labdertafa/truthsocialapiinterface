@@ -1,7 +1,10 @@
 package com.laboratorio.truthsocialapiinterface.impl;
 
 import com.google.gson.JsonSyntaxException;
+import com.laboratorio.clientapilibrary.exceptions.ApiClientException;
+import com.laboratorio.clientapilibrary.model.ApiMethodType;
 import com.laboratorio.clientapilibrary.model.ApiRequest;
+import com.laboratorio.clientapilibrary.model.ApiResponse;
 import com.laboratorio.truthsocialapiinterface.exception.TruthsocialApiException;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialAccount;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialMediaAttachment;
@@ -14,9 +17,9 @@ import com.laboratorio.truthsocialapiinterface.model.response.TruthsocialAccount
 /**
  *
  * @author Rafael
- * @version 1.2
+ * @version 1.3
  * @created 24/07/2024
- * @updated 17/09/2024
+ * @updated 05/10/2024
  */
 public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements TruthsocialStatusApi {
     public TruthsocialStatusApiImpl(String accessToken) {
@@ -30,17 +33,19 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
         
         try {
             String uri = endpoint + "/" + id;
-            ApiRequest request = new ApiRequest(uri, okStatus);
-            
+            ApiRequest request = new ApiRequest(uri, okStatus, ApiMethodType.GET);
             request = this.addHeadersAndCookies(request, false);
             
-            String jsonStr = this.client.executeGetRequest(request);
+            ApiResponse response = this.client.executeApiRequest(request);
 
-            return this.gson.fromJson(jsonStr, TruthsocialStatus.class);
+            return this.gson.fromJson(response.getResponseStr(), TruthsocialStatus.class);
+        } catch (ApiClientException e) {
+            throw e;
         } catch (JsonSyntaxException e) {
             logException(e);
             throw e;
         } catch (Exception e) {
+            logException(e);
             throw new TruthsocialApiException(TruthsocialStatusApiImpl.class.getName(), e.getMessage());
         }
     }
@@ -57,17 +62,19 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
         
         try {
             String uri = endpoint + "/" + id;
-            ApiRequest request = new ApiRequest(uri, okStatus);
-            
+            ApiRequest request = new ApiRequest(uri, okStatus, ApiMethodType.DELETE);
             request = this.addHeadersAndCookies(request, true);
             
-            String jsonStr = this.client.executeDeleteRequest(request);
+            ApiResponse response = this.client.executeApiRequest(request);
 
-            return this.gson.fromJson(jsonStr, TruthsocialStatus.class);
+            return this.gson.fromJson(response.getResponseStr(), TruthsocialStatus.class);
+        } catch (ApiClientException e) {
+            throw e;
         } catch (JsonSyntaxException e) {
             logException(e);
             throw  e;
         } catch (Exception e) {
+            logException(e);
             throw new TruthsocialApiException(TruthsocialStatusApiImpl.class.getName(), e.getMessage());
         }
     }
@@ -79,19 +86,20 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
         
         try {
             String uri = endpoint;
-            ApiRequest request = new ApiRequest(uri, okStatus);
+            ApiRequest request = new ApiRequest(uri, okStatus, ApiMethodType.POST);
             request.addApiPathParam("status", text);
             request.addApiPathParam("visibility", "public");
             request.addApiPathParam("language", "es");
             if (mediaAttachment != null) {
                 request.addApiPathParam("media_ids[]", mediaAttachment.getId());
             }
-            
             request = this.addHeadersAndCookies(request, true);
             
-            String jsonStr = this.client.executePostRequest(request);
+            ApiResponse response = this.client.executeApiRequest(request);
             
-            return this.gson.fromJson(jsonStr, TruthsocialStatus.class);
+            return this.gson.fromJson(response.getResponseStr(), TruthsocialStatus.class);
+        } catch (ApiClientException e) {
+            throw e;
         } catch (JsonSyntaxException e) {
             logException(e);
             throw  e;
@@ -110,9 +118,6 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
             }
             
             return this.postStatusWithImage(text, null);
-        } catch (JsonSyntaxException e) {
-            logException(e);
-            throw  e;
         } catch (Exception e) {
             throw new TruthsocialApiException(TruthsocialStatusApiImpl.class.getName(), e.getMessage());
         }
@@ -125,18 +130,21 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
         
         try {
             String uri = endpoint;
-            ApiRequest request = new ApiRequest(uri, okStatus);
+            ApiRequest request = new ApiRequest(uri, okStatus, ApiMethodType.POST);
             
             request = this.addHeadersAndCookies(request, true);
             request.addFileFormData("file", filePath);
             
-            String jsonStr = this.client.executePostRequest(request);
+            ApiResponse response = this.client.executeApiRequest(request);
             
-            return this.gson.fromJson(jsonStr, TruthsocialMediaAttachment.class);
+            return this.gson.fromJson(response.getResponseStr(), TruthsocialMediaAttachment.class);
+        } catch (ApiClientException e) {
+            throw e;
         } catch (JsonSyntaxException e) {
             logException(e);
             throw  e;
         } catch (Exception e) {
+            logException(e);
             throw new TruthsocialApiException(TruthsocialStatusApiImpl.class.getName(), e.getMessage());
         }
     }
@@ -189,17 +197,20 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
     
     private TruthsocialStatus executeSimplePost(String uri, int okStatus) {
         try {
-            ApiRequest request = new ApiRequest(uri, okStatus);
+            ApiRequest request = new ApiRequest(uri, okStatus, ApiMethodType.POST);
             
             request = this.addHeadersAndCookies(request, true);
             
-            String jsonStr = this.client.executePostRequest(request);
+            ApiResponse response = this.client.executeApiRequest(request);
             
-            return this.gson.fromJson(jsonStr, TruthsocialStatus.class);
+            return this.gson.fromJson(response.getResponseStr(), TruthsocialStatus.class);
+        } catch (ApiClientException e) {
+            throw e;
         } catch (JsonSyntaxException e) {
             logException(e);
             throw  e;
         } catch (Exception e) {
+            logException(e);
             throw new TruthsocialApiException(TruthsocialStatusApiImpl.class.getName(), e.getMessage());
         }
     }

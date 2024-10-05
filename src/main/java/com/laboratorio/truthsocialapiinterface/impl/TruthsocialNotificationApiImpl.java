@@ -2,8 +2,10 @@ package com.laboratorio.truthsocialapiinterface.impl;
 
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+import com.laboratorio.clientapilibrary.exceptions.ApiClientException;
+import com.laboratorio.clientapilibrary.model.ApiMethodType;
 import com.laboratorio.clientapilibrary.model.ApiRequest;
-import com.laboratorio.clientapilibrary.model.ProcessedResponse;
+import com.laboratorio.clientapilibrary.model.ApiResponse;
 import com.laboratorio.truthsocialapiinterface.exception.TruthsocialApiException;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialNotification;
 import com.laboratorio.truthsocialapiinterface.model.response.TruthsocialNotificationListResponse;
@@ -13,9 +15,9 @@ import com.laboratorio.truthsocialapiinterface.TruthsocialNotificationApi;
 /**
  *
  * @author Rafael
- * @version 1.2
+ * @version 1.3
  * @created 25/07/2024
- * @updated 25/09/2024
+ * @updated 05/10/2024
  */
 public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implements TruthsocialNotificationApi {
     public TruthsocialNotificationApiImpl(String accessToken) {
@@ -40,7 +42,7 @@ public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implement
     // Función que devuelve una página de notificaciones de una cuenta
     private TruthsocialNotificationListResponse getNotificationPage(String uri, int limit, int okStatus, String posicionInicial) throws Exception {
         try {
-            ApiRequest request = new ApiRequest(uri, okStatus);
+            ApiRequest request = new ApiRequest(uri, okStatus, ApiMethodType.GET);
             request.addApiPathParam("limit", Integer.toString(limit));
             if (posicionInicial != null) {
                 request.addApiPathParam("min_id", posicionInicial);
@@ -48,26 +50,32 @@ public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implement
             
             request = this.addHeadersAndCookies(request, true);
             
-            ProcessedResponse response = this.client.getProcessedResponseGetRequest(request);
+            ApiResponse response = this.client.executeApiRequest(request);
             
             String minId = posicionInicial;
-            List<TruthsocialNotification> notifications = gson.fromJson(response.getResponseDetail(), new TypeToken<List<TruthsocialNotification>>(){}.getType());
+            List<TruthsocialNotification> notifications = gson.fromJson(response.getResponseStr(), new TypeToken<List<TruthsocialNotification>>(){}.getType());
             if (!notifications.isEmpty()) {
                 log.debug("Se ejecutó la query: " + uri);
                 log.debug("Resultados encontrados: " + notifications.size());
 
-                String linkHeader = response.getResponse().getHeaderString("link");
-                log.debug("Recibí este link: " + linkHeader);
-                minId = this.extractMinId(linkHeader);
-                log.debug("Valor del min_id: " + minId);
+            List<String> linkHeaderList = response.getHttpHeaders().get("link");
+                if ((linkHeaderList != null) && (!linkHeaderList.isEmpty())) {
+                    String linkHeader = linkHeaderList.get(0);
+                    log.debug("Recibí este link: " + linkHeader);
+                    minId = this.extractMinId(linkHeader);
+                    log.debug("Valor del min_id: " + minId);
+                }
             }
 
             // return accounts;
             return new TruthsocialNotificationListResponse(minId, notifications);
+        } catch (ApiClientException e) {
+            throw e;
         } catch (JsonSyntaxException e) {
             logException(e);
             throw e;
         } catch (Exception e) {
+            logException(e);
             throw new TruthsocialApiException(TruthsocialNotificationApiImpl.class.getName(), e.getMessage());
         }
     }

@@ -11,7 +11,7 @@
             <PatternLayout pattern="%d{yyyy-MM-dd 'at' HH:mm:ss z} %-5level %class{36} - %msg%xEx%n" />
             <TimeBasedTriggeringPolicy interval="1" />
             <DefaultRolloverStrategy>
-                <Delete basePath="logs/">
+                <Delete basePath="socialimprove/logs/">
                     <IfLastModified age="15d" />
                 </Delete>
             </DefaultRolloverStrategy>

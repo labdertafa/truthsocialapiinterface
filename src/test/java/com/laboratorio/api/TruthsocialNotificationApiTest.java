@@ -1,6 +1,6 @@
 package com.laboratorio.api;
 
-import com.laboratorio.truthsocialapiinterface.exception.TruthsocialApiException;
+import com.laboratorio.clientapilibrary.exceptions.ApiClientException;
 import com.laboratorio.truthsocialapiinterface.impl.TruthsocialNotificationApiImpl;
 import com.laboratorio.truthsocialapiinterface.model.response.TruthsocialNotificationListResponse;
 import com.laboratorio.truthsocialapiinterface.utils.TruthsocialApiConfig;
@@ -14,7 +14,7 @@ import com.laboratorio.truthsocialapiinterface.TruthsocialNotificationApi;
  * @author Rafael
  * @version 1.1
  * @created 25/07/2024
- * @updated 01/09/2024
+ * @updated 05/10/2024
  */
 public class TruthsocialNotificationApiTest {
     private String accessToken;
@@ -33,9 +33,6 @@ public class TruthsocialNotificationApiTest {
         TruthsocialNotificationListResponse notificationListResponse = this.notificationApi.getAllNotifications(0, cantidad);
 
         assertTrue(notificationListResponse.getNotifications().size() >= 0);
-        
-        //assertEquals(cantidad, notificationListResponse.getNotifications().size());
-        //assertTrue(notificationListResponse.getMaxId() != null);
     }
     
     @Test
@@ -46,8 +43,7 @@ public class TruthsocialNotificationApiTest {
         TruthsocialNotificationListResponse notificationListResponse = this.notificationApi.getAllNotifications(limit, cantidad);
 
         assertTrue(notificationListResponse.getNotifications().size() >= 0);
-        // assertEquals(cantidad, notificationListResponse.getNotifications().size());
-        // assertTrue(notificationListResponse.getMaxId() != null);
+
     }
     
     @Test
@@ -57,8 +53,6 @@ public class TruthsocialNotificationApiTest {
         TruthsocialNotificationListResponse notificationListResponse = this.notificationApi.getAllNotifications(0, cantidad);
 
         assertTrue(notificationListResponse.getNotifications().size() >= 0);
-        /* assertEquals(cantidad, notificationListResponse.getNotifications().size());
-        assertTrue(notificationListResponse.getMaxId() != null); */
     }
     
     @Test
@@ -66,15 +60,13 @@ public class TruthsocialNotificationApiTest {
         TruthsocialNotificationListResponse notificationListResponse = this.notificationApi.getAllNotifications();
 
         assertTrue(notificationListResponse.getNotifications().size() >= 0);
-        /* assertTrue(notificationListResponse.getNotifications().size() > 20);
-        assertTrue(notificationListResponse.getMaxId() != null); */
     }
     
     @Test
     public void getNotificationError() {
         this.notificationApi = new TruthsocialNotificationApiImpl("INVALID_TOKEN");
 
-        assertThrows(TruthsocialApiException.class, () -> {
+        assertThrows(ApiClientException.class, () -> {
             this.notificationApi.getAllNotifications();
         });
     }

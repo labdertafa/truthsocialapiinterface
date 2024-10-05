@@ -1,6 +1,6 @@
 package com.laboratorio.api;
 
-import com.laboratorio.truthsocialapiinterface.exception.TruthsocialApiException;
+import com.laboratorio.clientapilibrary.exceptions.ApiClientException;
 import com.laboratorio.truthsocialapiinterface.impl.TruthsocialAccountApiImpl;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialAccount;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialRelationship;
@@ -19,7 +19,7 @@ import com.laboratorio.truthsocialapiinterface.TruthsocialAccountApi;
  * @author Rafael
  * @version 1.1
  * @created 10/07/2024
- * @updated 29/09/2024
+ * @updated 04/10/2024
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TruthsocialAccountApiTest {
@@ -46,7 +46,7 @@ public class TruthsocialAccountApiTest {
     public void findAccountByInvalidId() {
         String id = "1125349753AAABBB60";
         
-        assertThrows(TruthsocialApiException.class, () -> {
+        assertThrows(ApiClientException.class, () -> {
             this.accountApi.getAccountById(id);
         });
     }
@@ -65,7 +65,7 @@ public class TruthsocialAccountApiTest {
     public void findAccountByInvalidAcct() {
         String acct = "@ZZZWWWWPPPSSSDDGGGFF";
         
-        assertThrows(TruthsocialApiException.class, () -> {
+        assertThrows(ApiClientException.class, () -> {
             this.accountApi.getAccountByUsername(acct);
         });
     }
@@ -113,7 +113,7 @@ public class TruthsocialAccountApiTest {
     public void getFollowersInvalidId() {
         String id = "1125349753AAABBB60";
         
-        assertThrows(TruthsocialApiException.class, () -> {
+        assertThrows(ApiClientException.class, () -> {
             this.accountApi.getFollowers(id);
         });
     }
@@ -161,7 +161,7 @@ public class TruthsocialAccountApiTest {
     public void getFollowingsInvalidId() {
         String id = "1125349753AAABBB60";
         
-        assertThrows(TruthsocialApiException.class, () -> {
+        assertThrows(ApiClientException.class, () -> {
             this.accountApi.getFollowings(id);
         });
     }
@@ -179,7 +179,7 @@ public class TruthsocialAccountApiTest {
     public void followInvalidAccount() {
         String id = "1125349753AAABBB60";
         
-        assertThrows(TruthsocialApiException.class, () -> {
+        assertThrows(ApiClientException.class, () -> {
             this.accountApi.followAccount(id);
         });
     }
@@ -197,7 +197,7 @@ public class TruthsocialAccountApiTest {
     public void unfollowInvalidAccount() {
         String id = "1125349753AAABBB60";
         
-        assertThrows(TruthsocialApiException.class, () -> {
+        assertThrows(ApiClientException.class, () -> {
             this.accountApi.unfollowAccount(id);
         });
     }

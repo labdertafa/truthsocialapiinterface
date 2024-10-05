@@ -3,10 +3,10 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.laboratorio</groupId>
     <artifactId>truthsocialapiinterface</artifactId>
-    <version>1.0.12</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
     <name>TruthSocial-Api-Interface</name>
-    <description>Librería que ejecutar las API de la red social Truth Social</description>
+    <description>Librería que ejecuta la API de la red social Truth Social</description>
     
     <url>https://github.com/labdertafa/truthsocialapiinterface</url>
     <licenses>
@@ -50,7 +50,7 @@
         <dependency>
             <groupId>com.laboratorio</groupId>
             <artifactId>clientapilibrary</artifactId>
-            <version>1.0.12</version>
+            <version>2.0.8</version>
         </dependency>
         
         <dependency>
