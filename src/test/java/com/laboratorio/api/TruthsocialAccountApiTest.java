@@ -19,7 +19,7 @@ import com.laboratorio.truthsocialapiinterface.TruthsocialAccountApi;
  * @author Rafael
  * @version 1.1
  * @created 10/07/2024
- * @updated 04/10/2024
+ * @updated 13/10/2024
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TruthsocialAccountApiTest {
@@ -220,11 +220,11 @@ public class TruthsocialAccountApiTest {
     }
     
     @Test
-    public void getSuggestionsWithoutLimit() {
-        int defaultLimit = Integer.parseInt(TruthsocialApiConfig.getInstance().getProperty("getSuggestions_default_limit"));
+    public void getSuggestions() {
+        int cantidad = 30;
         
-        List<TruthsocialAccount> accounts = this.accountApi.getSuggestions();
+        List<TruthsocialAccount> accounts = this.accountApi.getSuggestions(cantidad);
         
-        assertTrue(accounts.size() >= 0);
+        assertEquals(cantidad, accounts.size());
     }
 }

@@ -268,8 +268,8 @@ public class TruthsocialStatusApiTest {
         List<TruthsocialStatus> statuses = statusApi.getGlobalTimeline(quantity);
         int i = 0;
         for (TruthsocialStatus status : statuses) {
-            log.info(i + "-) Status: " + status.toString());
             i++;
+            log.info(i + "-) Status: " + status.toString());
         }
         
         assertEquals(quantity, statuses.size());

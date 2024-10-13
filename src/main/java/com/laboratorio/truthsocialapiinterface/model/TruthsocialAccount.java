@@ -13,9 +13,9 @@ import lombok.Setter;
 /**
  *
  * @author Rafael
- * @version 1.0
+ * @version 1.1
  * @created 10/07/2024
- * @updated 13/09/2024
+ * @updated 13/10/2024
  */
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
@@ -37,7 +37,6 @@ public class TruthsocialAccount {
     private boolean group;
     private boolean discoverable;
     private boolean indexable;
-    // private Account moved;
     private boolean suspended;
     private boolean limited;
     private String created_at;
@@ -111,5 +110,10 @@ public class TruthsocialAccount {
             return false;
         }
         return Objects.equals(this.username, other.username);
+    }
+
+    @Override
+    public String toString() {
+        return "TruthsocialAccount{" + "id=" + id + ", username=" + username + ", acct=" + acct + ", display_name=" + display_name + ", discoverable=" + discoverable + ", created_at=" + created_at + ", last_status_at=" + last_status_at + ", statuses_count=" + statuses_count + ", followers_count=" + followers_count + ", following_count=" + following_count + '}';
     }
 }

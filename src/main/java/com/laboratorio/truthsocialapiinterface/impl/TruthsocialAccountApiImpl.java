@@ -11,15 +11,17 @@ import com.laboratorio.truthsocialapiinterface.model.TruthsocialAccount;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialRelationship;
 import java.util.List;
 import com.laboratorio.truthsocialapiinterface.TruthsocialAccountApi;
+import static com.laboratorio.truthsocialapiinterface.impl.TruthsocialBaseApi.log;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialSuggestion;
-import java.util.stream.Collectors;
+import com.laboratorio.truthsocialapiinterface.model.response.TruthsocialSuggestionsListResponse;
+import java.util.ArrayList;
 
 /**
  *
  * @author Rafael
- * @version 1.3
+ * @version 1.4
  * @created 10/07/2024
- * @updated 04/10/2024
+ * @updated 13/10/2024
  */
 public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements TruthsocialAccountApi {
     public TruthsocialAccountApiImpl(String accessToken) {
@@ -195,37 +197,35 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
             throw new TruthsocialApiException(TruthsocialAccountApiImpl.class.getName(), e.getMessage());
         }
     }
-
-    @Override
-    public List<TruthsocialAccount> getSuggestions() {
-        return this.getSuggestions(0);
-    }
-
-    @Override
-    public List<TruthsocialAccount> getSuggestions(int limit) {
-        String endpoint = this.apiConfig.getProperty("getSuggestions_endpoint");
-        int okStatus = Integer.parseInt(this.apiConfig.getProperty("getSuggestions_ok_status"));
-        int defaultLimit = Integer.parseInt(this.apiConfig.getProperty("getSuggestions_default_limit"));
-        int maxLimit = Integer.parseInt(this.apiConfig.getProperty("getSuggestions_max_limit"));
-        int usedLimit = limit;
-        if ((limit == 0) || (limit > maxLimit)) {
-            usedLimit = defaultLimit;
-        }
-        
+    
+    private TruthsocialSuggestionsListResponse getSuggestionsPage(String uri, int okStatus, String nextPage) {
         try {
-            String uri = endpoint;
-            ApiRequest request = new ApiRequest(uri, okStatus, ApiMethodType.GET);
-            request.addApiPathParam("max_id", "81");
-            request.addApiPathParam("page", "2");
-            request.addApiPathParam("limit", Integer.toString(usedLimit));
+            ApiRequest request;
+            if (nextPage == null) {
+                request = new ApiRequest(uri, okStatus, ApiMethodType.GET);
+            } else {
+                request = new ApiRequest(nextPage, okStatus, ApiMethodType.GET);
+            }
             request = this.addHeadersAndCookies(request, true);
             
             ApiResponse response = this.client.executeApiRequest(request);
-            List<TruthsocialSuggestion> suggestions = this.gson.fromJson(response.getResponseStr(), new TypeToken<List<TruthsocialSuggestion>>(){}.getType());
             
-            return suggestions.stream()
-                    .map(s -> s.getAccount())
-                    .collect(Collectors.toList());
+            List<TruthsocialSuggestion> suggestions = this.gson.fromJson(response.getResponseStr(), new TypeToken<List<TruthsocialSuggestion>>(){}.getType());
+            String newNextPage = null;
+            if (!suggestions.isEmpty()) {
+                log.info("Se ejecutó la query: " + uri);
+                log.info("Resultados encontrados: " + suggestions.size());
+
+                List<String> linkHeaderList = response.getHttpHeaders().get("link");
+                if ((linkHeaderList != null) && (!linkHeaderList.isEmpty())) {
+                    String linkHeader = linkHeaderList.get(0);
+                    log.info("Recibí este link: " + linkHeader);
+                    newNextPage = this.getNextPageLink(linkHeader);
+                    log.info("Valor del newNextPage: " + newNextPage);
+                }
+            }
+
+            return new TruthsocialSuggestionsListResponse(suggestions, newNextPage);
         } catch (ApiClientException e) {
             throw e;
         } catch (JsonSyntaxException e) {
@@ -233,7 +233,51 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
             throw e;
         } catch (Exception e) {
             logException(e);
-            throw new TruthsocialApiException(TruthsocialAccountApiImpl.class.getName(), e.getMessage());
+            throw new TruthsocialApiException(TruthsocialBaseApi.class.getName(), e.getMessage());
+        }
+    }
+
+    @Override
+    public List<TruthsocialAccount> getSuggestions(int quantity) {
+        String endpoint = this.apiConfig.getProperty("getSuggestions_endpoint");
+        int okStatus = Integer.parseInt(this.apiConfig.getProperty("getSuggestions_ok_status"));
+        
+        List<TruthsocialAccount> accounts = new ArrayList<>();
+        boolean continuar = true;
+        String nextPage = null;
+        
+        try {
+            String uri = endpoint;
+            
+            do {
+                TruthsocialSuggestionsListResponse suggestionsListResponse = this.getSuggestionsPage(uri, okStatus, nextPage);
+                log.info("Elementos recuperados total: " + suggestionsListResponse.getSuggestions().size());
+
+                for (TruthsocialSuggestion suggestion : suggestionsListResponse.getSuggestions()) {
+                    TruthsocialAccount account = this.getAccountById(suggestion.getAccount_id());
+                    accounts.add(account);
+                    log.info("Account info: " + account.toString());
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        log.warn("No se pudo completar la espera durante la consulta de sugerencias de seguimiento");
+                    }
+                }
+                
+                nextPage = suggestionsListResponse.getNextPage();
+                log.info("getGlobalTimeline. Recuperados: " + accounts.size() + ". Next page: " + nextPage);
+                if (suggestionsListResponse.getSuggestions().isEmpty()) {
+                    continuar = false;
+                } else {
+                    if ((nextPage == null) || (accounts.size() >= quantity)) {
+                        continuar = false;
+                    }
+                }
+            } while (continuar);
+            
+            return accounts.subList(0, Math.min(quantity, accounts.size()));
+        } catch (Exception e) {
+            throw e;
         }
     }
 

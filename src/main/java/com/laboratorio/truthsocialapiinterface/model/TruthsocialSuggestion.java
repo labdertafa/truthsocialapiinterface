@@ -8,13 +8,17 @@ import lombok.Setter;
 /**
  *
  * @author Rafael
- * @version 1.0
+ * @version 1.1
  * @created 16/09/2024
- * @updated 17/09/2024
+ * @updated 13/10/2024
  */
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class TruthsocialSuggestion {
-    private String source;
-    private TruthsocialAccount account;
+    private String account_id;
+    private String account_avatar;
+    private String acct;
+    private String note;
+    private boolean verified;
+    private String display_name;
 }

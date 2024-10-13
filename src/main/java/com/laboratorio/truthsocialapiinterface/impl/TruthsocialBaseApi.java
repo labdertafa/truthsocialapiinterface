@@ -23,9 +23,9 @@ import org.apache.logging.log4j.Logger;
 /**
  *
  * @author Rafael
- * @version 1.3
+ * @version 1.4
  * @created 24/07/2024
- * @updated 04/10/2024
+ * @updated 13/10/2024
  */
 public class TruthsocialBaseApi {
     protected static final Logger log = LogManager.getLogger(TruthsocialBaseApi.class);
@@ -75,6 +75,19 @@ public class TruthsocialBaseApi {
         }
         
         return minId;
+    }
+    
+    protected String getNextPageLink(String input) {
+        // Expresión regular para buscar la URL de "rel=next"
+        String regex = "<([^>]+)>;\\s*rel=\"next\"";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+        
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        
+        return null;
     }
     
     protected ApiRequest addHeadersAndCookies(ApiRequest request, boolean needAuthorization) {

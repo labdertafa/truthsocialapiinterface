@@ -255,19 +255,6 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
         return executeSimplePost(url, okStatus);
     }
     
-    private String getNextPageLink(String input) {
-        // Expresión regular para buscar la URL de "rel=next"
-        String regex = "<([^>]+)>;\\s*rel=\"next\"";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(input);
-        
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        
-        return null;
-    }
-    
     private TruthsocialStatusListResponse getTimelinePage(String uri, int okStatus, String nextPage) {
         try {
             ApiRequest request;
@@ -295,7 +282,6 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
                 }
             }
 
-            // return accounts;
             return new TruthsocialStatusListResponse(statuses, newNextPage);
         } catch (ApiClientException e) {
             throw e;
