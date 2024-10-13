@@ -1,6 +1,7 @@
 package com.laboratorio.truthsocialapiinterface.impl;
 
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import com.laboratorio.clientapilibrary.exceptions.ApiClientException;
 import com.laboratorio.clientapilibrary.model.ApiMethodType;
 import com.laboratorio.clientapilibrary.model.ApiRequest;
@@ -13,13 +14,16 @@ import com.laboratorio.truthsocialapiinterface.utils.InstruccionInfo;
 import java.util.List;
 import com.laboratorio.truthsocialapiinterface.TruthsocialStatusApi;
 import com.laboratorio.truthsocialapiinterface.model.response.TruthsocialAccountListResponse;
+import com.laboratorio.truthsocialapiinterface.model.response.TruthsocialStatusListResponse;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
  * @author Rafael
- * @version 1.3
+ * @version 1.4
  * @created 24/07/2024
- * @updated 05/10/2024
+ * @updated 13/10/2024
  */
 public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements TruthsocialStatusApi {
     public TruthsocialStatusApiImpl(String accessToken) {
@@ -249,5 +253,96 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
         int okStatus = Integer.parseInt(this.apiConfig.getProperty("unfavouriteStatus_ok_status"));
         String url = endpoint + "/" + id + "/" + complementoUrl;
         return executeSimplePost(url, okStatus);
-    }   
+    }
+    
+    private String getNextPageLink(String input) {
+        // Expresión regular para buscar la URL de "rel=next"
+        String regex = "<([^>]+)>;\\s*rel=\"next\"";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+        
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        
+        return null;
+    }
+    
+    private TruthsocialStatusListResponse getTimelinePage(String uri, int okStatus, String nextPage) {
+        try {
+            ApiRequest request;
+            if (nextPage == null) {
+                request = new ApiRequest(uri, okStatus, ApiMethodType.GET);
+            } else {
+                request = new ApiRequest(nextPage, okStatus, ApiMethodType.GET);
+            }
+            request = this.addHeadersAndCookies(request, true);
+            
+            ApiResponse response = this.client.executeApiRequest(request);
+            
+            List<TruthsocialStatus> statuses = this.gson.fromJson(response.getResponseStr(), new TypeToken<List<TruthsocialStatus>>(){}.getType());
+            String newNextPage = null;
+            if (!statuses.isEmpty()) {
+                log.debug("Se ejecutó la query: " + uri);
+                log.debug("Resultados encontrados: " + statuses.size());
+
+                List<String> linkHeaderList = response.getHttpHeaders().get("link");
+                if ((linkHeaderList != null) && (!linkHeaderList.isEmpty())) {
+                    String linkHeader = linkHeaderList.get(0);
+                    log.debug("Recibí este link: " + linkHeader);
+                    newNextPage = this.getNextPageLink(linkHeader);
+                    log.debug("Valor del newNextPage: " + newNextPage);
+                }
+            }
+
+            // return accounts;
+            return new TruthsocialStatusListResponse(statuses, newNextPage);
+        } catch (ApiClientException e) {
+            throw e;
+        } catch (JsonSyntaxException e) {
+            logException(e);
+            throw e;
+        } catch (Exception e) {
+            logException(e);
+            throw new TruthsocialApiException(TruthsocialBaseApi.class.getName(), e.getMessage());
+        }
+    }
+
+    @Override
+    public List<TruthsocialStatus> getGlobalTimeline(int quantity) {
+        String endpoint = this.apiConfig.getProperty("getGlobalTimeLine_endpoint");
+        int okStatus = Integer.parseInt(this.apiConfig.getProperty("getGlobalTimeLine_ok_status"));
+        
+        List<TruthsocialStatus> statuses = null;
+        boolean continuar = true;
+        String nextPage = null;
+        
+        try {
+            String uri = endpoint;
+            
+            do {
+                TruthsocialStatusListResponse statusListResponse = this.getTimelinePage(uri, okStatus, nextPage);
+                log.debug("Elementos recuperados total: " + statusListResponse.getStatuses().size());
+                if (statuses == null) {
+                    statuses = statusListResponse.getStatuses();
+                } else {
+                    statuses.addAll(statusListResponse.getStatuses());
+                }
+                
+                nextPage = statusListResponse.getNextPage();
+                log.debug("getGlobalTimeline. Recuperados: " + statuses.size() + ". Next page: " + nextPage);
+                if (statusListResponse.getStatuses().isEmpty()) {
+                    continuar = false;
+                } else {
+                    if ((nextPage == null) || (statuses.size() >= quantity)) {
+                        continuar = false;
+                    }
+                }
+            } while (continuar);
+            
+            return statuses.subList(0, Math.min(quantity, statuses.size()));
+        } catch (Exception e) {
+            throw e;
+        }
+    }
 }

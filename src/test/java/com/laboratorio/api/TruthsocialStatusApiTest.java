@@ -14,17 +14,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import com.laboratorio.truthsocialapiinterface.TruthsocialStatusApi;
 import com.laboratorio.truthsocialapiinterface.exception.TruthsocialApiException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Rafael
  * @version 1.1
  * @created 24/07/2024
- * @updated 05/10/2024
+ * @updated 13/10/2024
  */
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TruthsocialStatusApiTest {
+    protected static final Logger log = LogManager.getLogger(TruthsocialStatusApiTest.class);
     private String accessToken;
     private TruthsocialStatusApi statusApi;
     private static String idElim = "";
@@ -256,5 +259,19 @@ public class TruthsocialStatusApiTest {
         assertThrows(ApiClientException.class, () -> {
             this.statusApi.unfavouriteStatus(id);
         });
+    }
+    
+    @Test
+    public void getGlobalTimeline() {
+        int quantity = 50;
+        
+        List<TruthsocialStatus> statuses = statusApi.getGlobalTimeline(quantity);
+        int i = 0;
+        for (TruthsocialStatus status : statuses) {
+            log.info(i + "-) Status: " + status.toString());
+            i++;
+        }
+        
+        assertEquals(quantity, statuses.size());
     }
 }

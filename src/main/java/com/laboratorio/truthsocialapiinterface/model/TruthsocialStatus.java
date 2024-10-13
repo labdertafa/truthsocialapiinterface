@@ -10,7 +10,7 @@ import lombok.Setter;
  * @author Rafael
  * @version 1.0
  * @created 24/07/2024
- * @updated 01/09/2024
+ * @updated 13/10/2024
  */
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
@@ -46,4 +46,9 @@ public class TruthsocialStatus {
     private boolean bookmarked;
     private boolean pinned;
     private TruthsocialFilterResult[] filtered;
+
+    @Override
+    public String toString() {
+        return "TruthsocialStatus{" + "id=" + id + ", created_at=" + created_at + ", content=" + content + ", reblogs_count=" + reblogs_count + ", favourites_count=" + favourites_count + ", replies_count=" + replies_count + ", url=" + url + ", language=" + language + ", text=" + text + '}';
+    }
 }
