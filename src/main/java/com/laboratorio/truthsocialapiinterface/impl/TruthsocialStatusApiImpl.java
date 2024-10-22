@@ -15,15 +15,13 @@ import java.util.List;
 import com.laboratorio.truthsocialapiinterface.TruthsocialStatusApi;
 import com.laboratorio.truthsocialapiinterface.model.response.TruthsocialAccountListResponse;
 import com.laboratorio.truthsocialapiinterface.model.response.TruthsocialStatusListResponse;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  *
  * @author Rafael
  * @version 1.4
  * @created 24/07/2024
- * @updated 13/10/2024
+ * @updated 17/10/2024
  */
 public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements TruthsocialStatusApi {
     public TruthsocialStatusApiImpl(String accessToken) {

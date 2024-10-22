@@ -15,13 +15,14 @@ import static com.laboratorio.truthsocialapiinterface.impl.TruthsocialBaseApi.lo
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialSuggestion;
 import com.laboratorio.truthsocialapiinterface.model.response.TruthsocialSuggestionsListResponse;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 /**
  *
  * @author Rafael
- * @version 1.4
+ * @version 1.5
  * @created 10/07/2024
- * @updated 13/10/2024
+ * @updated 22/10/2024
  */
 public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements TruthsocialAccountApi {
     public TruthsocialAccountApiImpl(String accessToken) {
@@ -98,6 +99,14 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
     }
     
     @Override
+    public List<String> getFollowersIds(String userId) throws Exception {
+        List<TruthsocialAccount> accounts = this.getFollowers(userId, 0);
+        return accounts.stream()
+                .map(account -> account.getId())
+                .collect(Collectors.toList());
+    }
+    
+    @Override
     public List<TruthsocialAccount> getFollowings(String id) throws Exception {
         return this.getFollowings(id, 0);
     }
@@ -115,6 +124,14 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
         String url = endpoint + "/" + id + "/" + complementoUrl;
         
         return this.getUserList(url, limit, okStatus);
+    }
+    
+    @Override
+    public List<String> getFollowingsIds(String userId) throws Exception {
+        List<TruthsocialAccount> accounts = this.getFollowings(userId, 0);
+        return accounts.stream()
+                .map(account -> account.getId())
+                .collect(Collectors.toList());
     }
     
     @Override
