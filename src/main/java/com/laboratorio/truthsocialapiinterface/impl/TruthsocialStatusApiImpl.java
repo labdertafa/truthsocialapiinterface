@@ -21,7 +21,7 @@ import com.laboratorio.truthsocialapiinterface.model.response.TruthsocialStatusL
  * @author Rafael
  * @version 1.4
  * @created 24/07/2024
- * @updated 17/10/2024
+ * @updated 11/03/2024
  */
 public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements TruthsocialStatusApi {
     public TruthsocialStatusApiImpl(String accessToken) {
@@ -36,7 +36,7 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
         try {
             String uri = endpoint + "/" + id;
             ApiRequest request = new ApiRequest(uri, okStatus, ApiMethodType.GET);
-            request = this.addHeadersAndCookies(request, false);
+            request = this.addHeaders(request, false);
             
             ApiResponse response = this.client.executeApiRequest(request);
 
@@ -65,7 +65,7 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
         try {
             String uri = endpoint + "/" + id;
             ApiRequest request = new ApiRequest(uri, okStatus, ApiMethodType.DELETE);
-            request = this.addHeadersAndCookies(request, true);
+            request = this.addHeaders(request, true);
             
             ApiResponse response = this.client.executeApiRequest(request);
 
@@ -95,7 +95,7 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
             if (mediaAttachment != null) {
                 request.addApiPathParam("media_ids[]", mediaAttachment.getId());
             }
-            request = this.addHeadersAndCookies(request, true);
+            request = this.addHeaders(request, true);
             
             ApiResponse response = this.client.executeApiRequest(request);
             
@@ -134,7 +134,7 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
             String uri = endpoint;
             ApiRequest request = new ApiRequest(uri, okStatus, ApiMethodType.POST);
             
-            request = this.addHeadersAndCookies(request, true);
+            request = this.addHeaders(request, true);
             request.addFileFormData("file", filePath);
             
             ApiResponse response = this.client.executeApiRequest(request);
@@ -201,7 +201,7 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
         try {
             ApiRequest request = new ApiRequest(uri, okStatus, ApiMethodType.POST);
             
-            request = this.addHeadersAndCookies(request, true);
+            request = this.addHeaders(request, true);
             
             ApiResponse response = this.client.executeApiRequest(request);
             
@@ -261,7 +261,7 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
             } else {
                 request = new ApiRequest(nextPage, okStatus, ApiMethodType.GET);
             }
-            request = this.addHeadersAndCookies(request, true);
+            request = this.addHeaders(request, true);
             
             ApiResponse response = this.client.executeApiRequest(request);
             

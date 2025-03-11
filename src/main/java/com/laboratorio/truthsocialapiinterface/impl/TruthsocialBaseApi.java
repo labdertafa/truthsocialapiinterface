@@ -8,7 +8,6 @@ import com.laboratorio.clientapilibrary.exceptions.ApiClientException;
 import com.laboratorio.clientapilibrary.model.ApiMethodType;
 import com.laboratorio.clientapilibrary.model.ApiRequest;
 import com.laboratorio.clientapilibrary.model.ApiResponse;
-import com.laboratorio.clientapilibrary.utils.CookieManager;
 import com.laboratorio.truthsocialapiinterface.exception.TruthsocialApiException;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialAccount;
 import com.laboratorio.truthsocialapiinterface.model.response.TruthsocialAccountListResponse;
@@ -23,9 +22,9 @@ import org.apache.logging.log4j.Logger;
 /**
  *
  * @author Rafael
- * @version 1.4
+ * @version 1.5
  * @created 24/07/2024
- * @updated 13/10/2024
+ * @updated 11/03/2025
  */
 public class TruthsocialBaseApi {
     protected static final Logger log = LogManager.getLogger(TruthsocialBaseApi.class);
@@ -36,8 +35,7 @@ public class TruthsocialBaseApi {
 
     public TruthsocialBaseApi(String accessToken) {
         this.apiConfig = TruthsocialApiConfig.getInstance();
-        String cookiesFilePath = this.apiConfig.getProperty("cookies_file");
-        this.client = new ApiClient(cookiesFilePath);
+        this.client = new ApiClient();
         this.accessToken = accessToken;
         this.gson = new Gson();
     }
@@ -90,12 +88,9 @@ public class TruthsocialBaseApi {
         return null;
     }
     
-    protected ApiRequest addHeadersAndCookies(ApiRequest request, boolean needAuthorization) {
+    protected ApiRequest addHeaders(ApiRequest request, boolean needAuthorization) {
         try {
-            String website = this.apiConfig.getProperty("truthsocial_website");
-            String cookiesFilePath = this.apiConfig.getProperty("cookies_file");
             String userAgent = this.apiConfig.getProperty("userAgent");
-            List<String> cookiesList = CookieManager.getWebsiteCookies(cookiesFilePath, website, userAgent);
 
             if (needAuthorization) {
                 request.addApiHeader("Authorization", "Bearer " + this.accessToken);
@@ -104,10 +99,6 @@ public class TruthsocialBaseApi {
             request.addApiHeader("Accept-Encoding", "gzip, deflate, br, zstd");
             request.addApiHeader("User-Agent", userAgent);
             
-            for (String cookie : cookiesList) {
-                request.addApiCookie(cookie);
-            }
-
             return request;
         } catch (Exception e) {
             logException(e);
@@ -120,7 +111,7 @@ public class TruthsocialBaseApi {
             ApiRequest request = new ApiRequest(uri, okStatus, ApiMethodType.GET);
             request.addApiPathParam("limit", Integer.toString(limit));
             
-            request = this.addHeadersAndCookies(request, true);
+            request = this.addHeaders(request, true);
             
             ApiResponse response = this.client.executeApiRequest(request);
 
@@ -145,7 +136,7 @@ public class TruthsocialBaseApi {
                 request.addApiPathParam("max_id", posicionInicial);
             }
             
-            request = this.addHeadersAndCookies(request, true);
+            request = this.addHeaders(request, true);
             
             ApiResponse response = this.client.executeApiRequest(request);
             

@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  * @author Rafael
  * @version 1.5
  * @created 10/07/2024
- * @updated 22/10/2024
+ * @updated 11/03/2025
  */
 public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements TruthsocialAccountApi {
     public TruthsocialAccountApiImpl(String accessToken) {
@@ -37,7 +37,7 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
         try {
             String uri = endpoint + "/" + id;
             ApiRequest request = new ApiRequest(uri, okStatus, ApiMethodType.GET);
-            request = this.addHeadersAndCookies(request, true);
+            request = this.addHeaders(request, true);
             
             ApiResponse response = this.client.executeApiRequest(request);
             
@@ -62,7 +62,7 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
             String uri = endpoint;
             ApiRequest request = new ApiRequest(uri, okStatus, ApiMethodType.GET);
             request.addApiPathParam("acct", username);
-            request = this.addHeadersAndCookies(request, false);
+            request = this.addHeaders(request, false);
             
             ApiResponse response = this.client.executeApiRequest(request);
             
@@ -143,7 +143,7 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
         try {
             String uri = endpoint + "/" + id + "/" + complementoUrl;
             ApiRequest request = new ApiRequest(uri, okStatus, ApiMethodType.POST);
-            request = this.addHeadersAndCookies(request, true);
+            request = this.addHeaders(request, true);
 
             ApiResponse response = this.client.executeApiRequest(request);
             
@@ -170,7 +170,7 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
             String uri = endpoint + "/" + id + "/" + complementoUrl;
             ApiRequest request = new ApiRequest(uri, okStatus, ApiMethodType.POST);
             
-            request = this.addHeadersAndCookies(request, true);
+            request = this.addHeaders(request, true);
             
             ApiResponse response = this.client.executeApiRequest(request);
             
@@ -199,7 +199,7 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
                 request.addApiPathParam("id[]", id);
             }
             
-            request = this.addHeadersAndCookies(request, true);
+            request = this.addHeaders(request, true);
             
             ApiResponse response = this.client.executeApiRequest(request);
 
@@ -223,7 +223,7 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
             } else {
                 request = new ApiRequest(nextPage, okStatus, ApiMethodType.GET);
             }
-            request = this.addHeadersAndCookies(request, true);
+            request = this.addHeaders(request, true);
             
             ApiResponse response = this.client.executeApiRequest(request);
             

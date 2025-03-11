@@ -17,7 +17,7 @@ import com.laboratorio.truthsocialapiinterface.TruthsocialNotificationApi;
  * @author Rafael
  * @version 1.3
  * @created 25/07/2024
- * @updated 05/10/2024
+ * @updated 11/03/2024
  */
 public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implements TruthsocialNotificationApi {
     public TruthsocialNotificationApiImpl(String accessToken) {
@@ -48,7 +48,7 @@ public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implement
                 request.addApiPathParam("min_id", posicionInicial);
             }
             
-            request = this.addHeadersAndCookies(request, true);
+            request = this.addHeaders(request, true);
             
             ApiResponse response = this.client.executeApiRequest(request);
             
