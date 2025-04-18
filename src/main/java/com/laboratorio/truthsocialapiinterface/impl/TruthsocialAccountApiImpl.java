@@ -230,15 +230,15 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
             List<TruthsocialSuggestion> suggestions = this.gson.fromJson(response.getResponseStr(), new TypeToken<List<TruthsocialSuggestion>>(){}.getType());
             String newNextPage = null;
             if (!suggestions.isEmpty()) {
-                log.info("Se ejecutó la query: " + uri);
-                log.info("Resultados encontrados: " + suggestions.size());
+                log.debug("Se ejecutó la query: " + uri);
+                log.debug("Resultados encontrados: " + suggestions.size());
 
                 List<String> linkHeaderList = response.getHttpHeaders().get("link");
                 if ((linkHeaderList != null) && (!linkHeaderList.isEmpty())) {
                     String linkHeader = linkHeaderList.get(0);
-                    log.info("Recibí este link: " + linkHeader);
+                    log.debug("Recibí este link: " + linkHeader);
                     newNextPage = this.getNextPageLink(linkHeader);
-                    log.info("Valor del newNextPage: " + newNextPage);
+                    log.debug("Valor del newNextPage: " + newNextPage);
                 }
             }
 
@@ -268,12 +268,12 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
             
             do {
                 TruthsocialSuggestionsListResponse suggestionsListResponse = this.getSuggestionsPage(uri, okStatus, nextPage);
-                log.info("Elementos recuperados total: " + suggestionsListResponse.getSuggestions().size());
+                log.debug("Elementos recuperados total: " + suggestionsListResponse.getSuggestions().size());
 
                 for (TruthsocialSuggestion suggestion : suggestionsListResponse.getSuggestions()) {
                     TruthsocialAccount account = this.getAccountById(suggestion.getAccount_id());
                     accounts.add(account);
-                    log.info("Account info: " + account.toString());
+                    log.debug("Account info: " + account.toString());
                     try {
                         Thread.sleep(5000);
                     } catch (InterruptedException e) {
@@ -282,7 +282,7 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
                 }
                 
                 nextPage = suggestionsListResponse.getNextPage();
-                log.info("getGlobalTimeline. Recuperados: " + accounts.size() + ". Next page: " + nextPage);
+                log.debug("getGlobalTimeline. Recuperados: " + accounts.size() + ". Next page: " + nextPage);
                 if (suggestionsListResponse.getSuggestions().isEmpty()) {
                     continuar = false;
                 } else {

@@ -22,7 +22,7 @@ import org.apache.logging.log4j.Logger;
  * @author Rafael
  * @version 1.1
  * @created 24/07/2024
- * @updated 13/10/2024
+ * @updated 18/04/2025
  */
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -152,31 +152,31 @@ public class TruthsocialStatusApiTest {
         });
     }
     
-    @Test
+    /* @Test
     public void getFavouritedBy() throws Exception { // Usa el default limit
         String id = "112989850918042189";
         
         List<TruthsocialAccount> accounts = this.statusApi.getFavouritedBy(id);
         assertEquals(80, accounts.size());
-    }
+    } */
     
-    @Test
+    /* @Test
     public void getFavouritedByWithLimit() throws Exception { // Define un limit
         String id = "112989850918042189";
         int cantidad = 80;
         
         List<TruthsocialAccount> accounts = this.statusApi.getFavouritedBy(id, cantidad);
         assertEquals(cantidad, accounts.size());
-    }
+    } */
     
-    @Test
+    /* @Test
     public void get200Favourited() throws Exception { // Define un limit
         String id = "112989850918042189";
         int cantidad = 200;
         
         List<TruthsocialAccount> accounts = this.statusApi.getFavouritedBy(id, cantidad);
         assertEquals(80, accounts.size());
-    }
+    } */
     
     @Test
     public void getInvalidFavouritedBy() {

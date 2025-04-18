@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
  * @author Rafael
  * @version 1.5
  * @created 24/07/2024
- * @updated 11/03/2025
+ * @updated 18/04/2025
  */
 public class TruthsocialBaseApi {
     protected static final Logger log = LogManager.getLogger(TruthsocialBaseApi.class);
@@ -97,6 +97,9 @@ public class TruthsocialBaseApi {
             }
             request.addApiHeader("Accept", "application/json, text/plain, */*");
             request.addApiHeader("Accept-Encoding", "gzip, deflate, br, zstd");
+            request.addApiHeader("Cache-Control", "no-cache");
+            request.addApiHeader("Host", "truthsocial.com");
+            request.addApiHeader("Pragma", "no-cache");
             request.addApiHeader("User-Agent", userAgent);
             
             return request;
