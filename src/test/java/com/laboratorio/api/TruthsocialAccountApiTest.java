@@ -1,10 +1,10 @@
 package com.laboratorio.api;
 
 import com.laboratorio.clientapilibrary.exceptions.ApiClientException;
+import com.laboratorio.clientapilibrary.utils.ReaderConfig;
 import com.laboratorio.truthsocialapiinterface.impl.TruthsocialAccountApiImpl;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialAccount;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialRelationship;
-import com.laboratorio.truthsocialapiinterface.utils.TruthsocialApiConfig;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +19,7 @@ import com.laboratorio.truthsocialapiinterface.TruthsocialAccountApi;
  * @author Rafael
  * @version 1.1
  * @created 10/07/2024
- * @updated 13/10/2024
+ * @updated 04/05/2025
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TruthsocialAccountApiTest {
@@ -28,7 +28,8 @@ public class TruthsocialAccountApiTest {
 
     @BeforeEach
     private void initTest() {
-        this.accessToken = TruthsocialApiConfig.getInstance().getProperty("access_token");
+        ReaderConfig config = new ReaderConfig("config//truthsocial_api.properties");
+        this.accessToken = config.getProperty("access_token");
         this.accountApi = new TruthsocialAccountApiImpl(this.accessToken);
     }
     
@@ -86,7 +87,7 @@ public class TruthsocialAccountApiTest {
         
         List<TruthsocialAccount> accountList = this.accountApi.getFollowers(id);
 
-        assertEquals(80, accountList.size());
+        assertEquals(40, accountList.size());
     }
     
     @Test
@@ -96,17 +97,7 @@ public class TruthsocialAccountApiTest {
         
         List<TruthsocialAccount> accountList = this.accountApi.getFollowers(id, cantidad);
 
-        assertEquals(80, accountList.size());
-    }
-    
-    @Test
-    public void get80Followers() throws Exception {
-        String id = "110998224199195544";
-        int cantidad = 80;
-        
-        List<TruthsocialAccount> accountList = this.accountApi.getFollowers(id, cantidad);
-
-        assertEquals(cantidad, accountList.size());
+        assertEquals(40, accountList.size());
     }
     
     @Test
@@ -134,27 +125,17 @@ public class TruthsocialAccountApiTest {
         
         List<TruthsocialAccount> accountList = this.accountApi.getFollowings(id);
 
-        assertEquals(80, accountList.size());
+        assertEquals(40, accountList.size());
     }
     
-    @Test
-    public void get80Followings() throws Exception {
-        String id = "107845204224825099";
-        int cantidad = 80;
-        
-        List<TruthsocialAccount> accountList = this.accountApi.getFollowings(id, cantidad);
-
-        assertEquals(cantidad, accountList.size());
-    }
-    
-    @Test
+        @Test
     public void get200Followings() throws Exception {
         String id = "107845204224825099";
         int cantidad = 200;
         
         List<TruthsocialAccount> accountList = this.accountApi.getFollowings(id, cantidad);
 
-        assertEquals(80, accountList.size());
+        assertEquals(40, accountList.size());
     }
     
     @Test

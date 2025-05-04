@@ -1,6 +1,6 @@
 package com.laboratorio.truthsocialapiinterface.model;
 
-import com.laboratorio.truthsocialapiinterface.utils.TruthsocialApiConfig;
+import com.laboratorio.clientapilibrary.utils.ReaderConfig;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -15,7 +15,7 @@ import lombok.Setter;
  * @author Rafael
  * @version 1.1
  * @created 10/07/2024
- * @updated 13/10/2024
+ * @updated 04/05/2025
  */
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
@@ -66,7 +66,7 @@ public class TruthsocialAccount {
             } catch (Exception e) {
                 return false;
             }
-            TruthsocialApiConfig config = TruthsocialApiConfig.getInstance();
+            ReaderConfig config = new ReaderConfig("config//truthsocial_api.properties");
             int maxInactividad = Integer.parseInt(config.getProperty("dias_inactividad_cuenta"));
             long nDays = ChronoUnit.DAYS.between(ultimaActividad, LocalDate.now());
             return Math.abs(nDays) <= maxInactividad;
@@ -80,7 +80,7 @@ public class TruthsocialAccount {
             return false;
         }
         
-        TruthsocialApiConfig config = TruthsocialApiConfig.getInstance();
+        ReaderConfig config = new ReaderConfig("config//truthsocial_api.properties");
         int umbral = Integer.parseInt(config.getProperty("umbral_fuente_seguidores"));
         return this.followers_count >= umbral;
     }

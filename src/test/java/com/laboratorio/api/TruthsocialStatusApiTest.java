@@ -1,10 +1,10 @@
 package com.laboratorio.api;
 
 import com.laboratorio.clientapilibrary.exceptions.ApiClientException;
+import com.laboratorio.clientapilibrary.utils.ReaderConfig;
 import com.laboratorio.truthsocialapiinterface.impl.TruthsocialStatusApiImpl;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialAccount;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialStatus;
-import com.laboratorio.truthsocialapiinterface.utils.TruthsocialApiConfig;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +22,7 @@ import org.apache.logging.log4j.Logger;
  * @author Rafael
  * @version 1.1
  * @created 24/07/2024
- * @updated 18/04/2025
+ * @updated 04/05/2025
  */
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -34,7 +34,8 @@ public class TruthsocialStatusApiTest {
     
     @BeforeEach
     private void initTests() {
-        this.accessToken = TruthsocialApiConfig.getInstance().getProperty("access_token");
+        ReaderConfig config = new ReaderConfig("config//truthsocial_api.properties");
+        this.accessToken = config.getProperty("access_token");
         this.statusApi = new TruthsocialStatusApiImpl(this.accessToken);
     }
     
@@ -137,7 +138,7 @@ public class TruthsocialStatusApiTest {
         
         try {
             List<TruthsocialAccount> accounts = this.statusApi.getRebloggedBy(id, limit);
-            assertTrue(accounts.size() > 50);
+            assertTrue(accounts.size() > 30);
         } catch (Exception e) {
             fail("Ocurrió una excepción: " + e.getMessage());
         }

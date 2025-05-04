@@ -1,9 +1,9 @@
 package com.laboratorio.api;
 
 import com.laboratorio.clientapilibrary.exceptions.ApiClientException;
+import com.laboratorio.clientapilibrary.utils.ReaderConfig;
 import com.laboratorio.truthsocialapiinterface.impl.TruthsocialNotificationApiImpl;
 import com.laboratorio.truthsocialapiinterface.model.response.TruthsocialNotificationListResponse;
-import com.laboratorio.truthsocialapiinterface.utils.TruthsocialApiConfig;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +14,7 @@ import com.laboratorio.truthsocialapiinterface.TruthsocialNotificationApi;
  * @author Rafael
  * @version 1.1
  * @created 25/07/2024
- * @updated 05/10/2024
+ * @updated 04/05/2025
  */
 public class TruthsocialNotificationApiTest {
     private String accessToken;
@@ -22,7 +22,8 @@ public class TruthsocialNotificationApiTest {
     
     @BeforeEach
     private void initNotificationApi() {
-        this.accessToken = TruthsocialApiConfig.getInstance().getProperty("access_token");
+        ReaderConfig config = new ReaderConfig("config//truthsocial_api.properties");
+        this.accessToken = config.getProperty("access_token");
         this.notificationApi = new TruthsocialNotificationApiImpl(this.accessToken);
     }
     

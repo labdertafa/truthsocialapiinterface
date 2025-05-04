@@ -8,11 +8,11 @@ import com.laboratorio.clientapilibrary.exceptions.ApiClientException;
 import com.laboratorio.clientapilibrary.model.ApiMethodType;
 import com.laboratorio.clientapilibrary.model.ApiRequest;
 import com.laboratorio.clientapilibrary.model.ApiResponse;
+import com.laboratorio.clientapilibrary.utils.ReaderConfig;
 import com.laboratorio.truthsocialapiinterface.exception.TruthsocialApiException;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialAccount;
 import com.laboratorio.truthsocialapiinterface.model.response.TruthsocialAccountListResponse;
 import com.laboratorio.truthsocialapiinterface.utils.InstruccionInfo;
-import com.laboratorio.truthsocialapiinterface.utils.TruthsocialApiConfig;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,17 +24,17 @@ import org.apache.logging.log4j.Logger;
  * @author Rafael
  * @version 1.5
  * @created 24/07/2024
- * @updated 18/04/2025
+ * @updated 04/05/2025
  */
 public class TruthsocialBaseApi {
     protected static final Logger log = LogManager.getLogger(TruthsocialBaseApi.class);
     protected final ApiClient client;
     protected final String accessToken;
-    protected TruthsocialApiConfig apiConfig;
+    protected ReaderConfig apiConfig;
     protected final Gson gson;
 
     public TruthsocialBaseApi(String accessToken) {
-        this.apiConfig = TruthsocialApiConfig.getInstance();
+        this.apiConfig = new ReaderConfig("config//truthsocial_api.properties");
         this.client = new ApiClient();
         this.accessToken = accessToken;
         this.gson = new Gson();
