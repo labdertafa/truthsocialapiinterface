@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.laboratorio</groupId>
     <artifactId>truthsocialapiinterface</artifactId>
-    <version>1.1.8</version>
+    <version>1.1.9</version>
     <packaging>jar</packaging>
     <name>TruthSocial-Api-Interface</name>
     <description>Librería que ejecuta la API de la red social Truth Social</description>
@@ -46,57 +46,60 @@
         </repository>
     </repositories>
     
+    <dependencyManagement>                            <!-- ① Importar el BOM -->
+        <dependencies>
+            <dependency>
+                <groupId>com.laboratorio</groupId>
+                <artifactId>clientapilibrary</artifactId>
+                <version>2.1.4</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    
     <dependencies>
         <dependency>
             <groupId>com.laboratorio</groupId>
-            <artifactId>clientapilibrary</artifactId>
-            <version>2.1.0</version>
+            <artifactId>clientapilibrary-core</artifactId>
+            <version>2.1.4</version>
         </dependency>
         
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.38</version>
-            <scope>provided</scope>
         </dependency>
         
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.12.1</version>
-            <type>jar</type>
         </dependency>
         
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.24.3</version>
         </dependency>
         
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.24.3</version>
         </dependency>
         
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.12.0</version>
             <scope>test</scope>
         </dependency>
         
         <dependency>
             <artifactId>junit</artifactId>
             <groupId>junit</groupId>
-            <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
         
         <dependency>
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
-            <version>5.12.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
