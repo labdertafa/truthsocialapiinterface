@@ -1,10 +1,8 @@
 package com.laboratorio.truthsocialapiinterface.impl;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.laboratorio.clientapilibrary.ApiClient;
-import com.laboratorio.clientapilibrary.exceptions.ApiClientException;
 import com.laboratorio.clientapilibrary.model.ApiMethodType;
 import com.laboratorio.clientapilibrary.model.ApiRequest;
 import com.laboratorio.clientapilibrary.model.ApiResponse;
@@ -24,7 +22,7 @@ import org.apache.logging.log4j.Logger;
  * @author Rafael
  * @version 1.5
  * @created 24/07/2024
- * @updated 04/05/2025
+ * @updated 06/06/2025
  */
 public class TruthsocialBaseApi {
     protected static final Logger log = LogManager.getLogger(TruthsocialBaseApi.class);
@@ -38,13 +36,6 @@ public class TruthsocialBaseApi {
         this.client = new ApiClient();
         this.accessToken = accessToken;
         this.gson = new Gson();
-    }
-    
-    protected void logException(Exception e) {
-        log.error("Error: " + e.getMessage());
-        if (e.getCause() != null) {
-            log.error("Causa: " + e.getCause().getMessage());
-        }
     }
     
     // Función que extrae el max_id de la respuesta
@@ -89,24 +80,19 @@ public class TruthsocialBaseApi {
     }
     
     protected ApiRequest addHeaders(ApiRequest request, boolean needAuthorization) {
-        try {
-            String userAgent = this.apiConfig.getProperty("userAgent");
+        String userAgent = this.apiConfig.getProperty("userAgent");
 
-            if (needAuthorization) {
-                request.addApiHeader("Authorization", "Bearer " + this.accessToken);
-            }
-            request.addApiHeader("Accept", "application/json, text/plain, */*");
-            request.addApiHeader("Accept-Encoding", "gzip, deflate, br, zstd");
-            request.addApiHeader("Cache-Control", "no-cache");
-            request.addApiHeader("Host", "truthsocial.com");
-            request.addApiHeader("Pragma", "no-cache");
-            request.addApiHeader("User-Agent", userAgent);
-            
-            return request;
-        } catch (Exception e) {
-            logException(e);
-            throw new TruthsocialApiException(TruthsocialBaseApi.class.getName(), e.getMessage());
+        if (needAuthorization) {
+            request.addApiHeader("Authorization", "Bearer " + this.accessToken);
         }
+        request.addApiHeader("Accept", "application/json, text/plain, */*");
+        request.addApiHeader("Accept-Encoding", "gzip, deflate, br, zstd");
+        request.addApiHeader("Cache-Control", "no-cache");
+        request.addApiHeader("Host", "truthsocial.com");
+        request.addApiHeader("Pragma", "no-cache");
+        request.addApiHeader("User-Agent", userAgent);
+
+        return request;
     }
     
     protected List<TruthsocialAccount> getUserList(String uri, int limit, int okStatus) throws Exception {
@@ -117,16 +103,11 @@ public class TruthsocialBaseApi {
             request = this.addHeaders(request, true);
             
             ApiResponse response = this.client.executeApiRequest(request);
+            log.debug("Response getUserList: {}", response.getResponseStr());
 
             return this.gson.fromJson(response.getResponseStr(), new TypeToken<List<TruthsocialAccount>>(){}.getType());
-        } catch (ApiClientException e) {
-            throw e;
-        } catch (JsonSyntaxException e) {
-            logException(e);
-            throw e;
         } catch (Exception e) {
-            logException(e);
-            throw new TruthsocialApiException(TruthsocialBaseApi.class.getName(), e.getMessage());
+            throw new TruthsocialApiException("Error recuperando una lista de usuarios: " + uri, e);
         }
     }
     
@@ -160,14 +141,8 @@ public class TruthsocialBaseApi {
 
             // return accounts;
             return new TruthsocialAccountListResponse(maxId, accounts);
-        } catch (ApiClientException e) {
-            throw e;
-        } catch (JsonSyntaxException e) {
-            logException(e);
-            throw e;
         } catch (Exception e) {
-            logException(e);
-            throw new TruthsocialApiException(TruthsocialBaseApi.class.getName(), e.getMessage());
+            throw new TruthsocialApiException("Error recuperando una página de cuentas: " + uri, e);
         }
     }
     

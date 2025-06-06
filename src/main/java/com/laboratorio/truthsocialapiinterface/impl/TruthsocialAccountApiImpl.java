@@ -1,8 +1,6 @@
 package com.laboratorio.truthsocialapiinterface.impl;
 
-import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
-import com.laboratorio.clientapilibrary.exceptions.ApiClientException;
 import com.laboratorio.clientapilibrary.model.ApiMethodType;
 import com.laboratorio.clientapilibrary.model.ApiRequest;
 import com.laboratorio.clientapilibrary.model.ApiResponse;
@@ -22,7 +20,7 @@ import java.util.stream.Collectors;
  * @author Rafael
  * @version 1.5
  * @created 10/07/2024
- * @updated 11/03/2025
+ * @updated 06/06/2025
  */
 public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements TruthsocialAccountApi {
     public TruthsocialAccountApiImpl(String accessToken) {
@@ -40,16 +38,11 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
             request = this.addHeaders(request, true);
             
             ApiResponse response = this.client.executeApiRequest(request);
+            log.debug("Response getAccountById: {}", response.getResponseStr());
             
             return this.gson.fromJson(response.getResponseStr(), TruthsocialAccount.class);
-        } catch (ApiClientException e) {
-            throw e;
-        } catch (JsonSyntaxException e) {
-            logException(e);
-            throw e;
         } catch (Exception e) {
-            logException(e);
-            throw new TruthsocialApiException(TruthsocialAccountApiImpl.class.getName(), e.getMessage());
+            throw new TruthsocialApiException("Error recuperando los datos de la cuenta Truthsocial con id: " + id, e);
         }
     }
     
@@ -65,16 +58,11 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
             request = this.addHeaders(request, false);
             
             ApiResponse response = this.client.executeApiRequest(request);
+            log.debug("Response getAccountByUsername: {}", response.getResponseStr());
             
             return this.gson.fromJson(response.getResponseStr(), TruthsocialAccount.class);
-        } catch (ApiClientException e) {
-            throw e;
-        } catch (JsonSyntaxException e) {
-            logException(e);
-            throw e;
         } catch (Exception e) {
-            logException(e);
-            throw new TruthsocialApiException(TruthsocialAccountApiImpl.class.getName(), e.getMessage());
+            throw new TruthsocialApiException("Error recuperando los datos de la cuenta Truthsocial con username: " + username, e);
         }
     }
     
@@ -146,17 +134,12 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
             request = this.addHeaders(request, true);
 
             ApiResponse response = this.client.executeApiRequest(request);
+            log.debug("Response followAccount: {}", response.getResponseStr());
             
             TruthsocialRelationship relationship = this.gson.fromJson(response.getResponseStr(), TruthsocialRelationship.class);
             return relationship.isFollowing();
-        } catch (ApiClientException e) {
-            throw e;
-        } catch (JsonSyntaxException e) {
-            logException(e);
-            throw  e;
         } catch (Exception e) {
-            logException(e);
-            throw new TruthsocialApiException(TruthsocialAccountApiImpl.class.getName(), e.getMessage());
+            throw new TruthsocialApiException("Error siguiendo a la cuenta Truthsocial con id: " + id, e);
         }
     }
     
@@ -173,17 +156,12 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
             request = this.addHeaders(request, true);
             
             ApiResponse response = this.client.executeApiRequest(request);
+            log.debug("Response unfollowAccount: {}", response.getResponseStr());
             
             TruthsocialRelationship relationship = this.gson.fromJson(response.getResponseStr(), TruthsocialRelationship.class);
             return !relationship.isFollowing();
-        } catch (ApiClientException e) {
-            throw e;
-        } catch (JsonSyntaxException e) {
-            logException(e);
-            throw  e;
         } catch (Exception e) {
-            logException(e);
-            throw new TruthsocialApiException(TruthsocialAccountApiImpl.class.getName(), e.getMessage());
+            throw new TruthsocialApiException("Error dejando de seguir a la cuenta Truthsocial con id: " + id, e);
         }
     }
     
@@ -202,16 +180,11 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
             request = this.addHeaders(request, true);
             
             ApiResponse response = this.client.executeApiRequest(request);
+            log.debug("Response checkrelationships: {}", response.getResponseStr());
 
             return this.gson.fromJson(response.getResponseStr(), new TypeToken<List<TruthsocialRelationship>>(){}.getType());
-        } catch (ApiClientException e) {
-            throw e;
-        } catch (JsonSyntaxException e) {
-            logException(e);
-            throw e;
         } catch (Exception e) {
-            logException(e);
-            throw new TruthsocialApiException(TruthsocialAccountApiImpl.class.getName(), e.getMessage());
+            throw new TruthsocialApiException("Error comprobando el estado de la relación entre cuentas Truthsocial", e);
         }
     }
     
@@ -243,14 +216,8 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
             }
 
             return new TruthsocialSuggestionsListResponse(suggestions, newNextPage);
-        } catch (ApiClientException e) {
-            throw e;
-        } catch (JsonSyntaxException e) {
-            logException(e);
-            throw e;
         } catch (Exception e) {
-            logException(e);
-            throw new TruthsocialApiException(TruthsocialBaseApi.class.getName(), e.getMessage());
+            throw new TruthsocialApiException("Error recuperando una páginma de sugerencias a seguir en Truthsocial", e);
         }
     }
 
@@ -312,7 +279,7 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
             
             return true;
         } catch (Exception e) {
-            throw new TruthsocialApiException(TruthsocialAccountApiImpl.class.getName(), e.getMessage());
+            throw new TruthsocialApiException("Error eliminado la sugerencia de seguimiento de Truthsocial con id: " + userId, e);
         }
     }
 }

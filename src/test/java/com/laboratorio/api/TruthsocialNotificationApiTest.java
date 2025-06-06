@@ -1,6 +1,5 @@
 package com.laboratorio.api;
 
-import com.laboratorio.clientapilibrary.exceptions.ApiClientException;
 import com.laboratorio.clientapilibrary.utils.ReaderConfig;
 import com.laboratorio.truthsocialapiinterface.impl.TruthsocialNotificationApiImpl;
 import com.laboratorio.truthsocialapiinterface.model.response.TruthsocialNotificationListResponse;
@@ -8,13 +7,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import com.laboratorio.truthsocialapiinterface.TruthsocialNotificationApi;
+import com.laboratorio.truthsocialapiinterface.exception.TruthsocialApiException;
 
 /**
  *
  * @author Rafael
  * @version 1.1
  * @created 25/07/2024
- * @updated 04/05/2025
+ * @updated 06/06/2025
  */
 public class TruthsocialNotificationApiTest {
     private String accessToken;
@@ -67,7 +67,7 @@ public class TruthsocialNotificationApiTest {
     public void getNotificationError() {
         this.notificationApi = new TruthsocialNotificationApiImpl("INVALID_TOKEN");
 
-        assertThrows(ApiClientException.class, () -> {
+        assertThrows(TruthsocialApiException.class, () -> {
             this.notificationApi.getAllNotifications();
         });
     }

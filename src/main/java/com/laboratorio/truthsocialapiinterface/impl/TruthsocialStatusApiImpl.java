@@ -21,7 +21,7 @@ import com.laboratorio.truthsocialapiinterface.model.response.TruthsocialStatusL
  * @author Rafael
  * @version 1.4
  * @created 24/07/2024
- * @updated 11/03/2024
+ * @updated 06/06/2025
  */
 public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements TruthsocialStatusApi {
     public TruthsocialStatusApiImpl(String accessToken) {
@@ -39,16 +39,11 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
             request = this.addHeaders(request, false);
             
             ApiResponse response = this.client.executeApiRequest(request);
+            log.debug("Response getStatusById: {}", response.getResponseStr());
 
             return this.gson.fromJson(response.getResponseStr(), TruthsocialStatus.class);
-        } catch (ApiClientException e) {
-            throw e;
-        } catch (JsonSyntaxException e) {
-            logException(e);
-            throw e;
         } catch (Exception e) {
-            logException(e);
-            throw new TruthsocialApiException(TruthsocialStatusApiImpl.class.getName(), e.getMessage());
+            throw new TruthsocialApiException("Error recuperando el estado Truthsocial con id: " + id, e);
         }
     }
 
@@ -68,16 +63,11 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
             request = this.addHeaders(request, true);
             
             ApiResponse response = this.client.executeApiRequest(request);
+            log.debug("Response deleteStatus: {}", response.getResponseStr());
 
             return this.gson.fromJson(response.getResponseStr(), TruthsocialStatus.class);
-        } catch (ApiClientException e) {
-            throw e;
-        } catch (JsonSyntaxException e) {
-            logException(e);
-            throw  e;
         } catch (Exception e) {
-            logException(e);
-            throw new TruthsocialApiException(TruthsocialStatusApiImpl.class.getName(), e.getMessage());
+            throw new TruthsocialApiException("Error eliminado el estado Truthsocial con id: " + id, e);
         }
     }
     
@@ -98,35 +88,31 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
             request = this.addHeaders(request, true);
             
             ApiResponse response = this.client.executeApiRequest(request);
+            log.debug("Response postStatusWithImage: {}", response.getResponseStr());
             
             return this.gson.fromJson(response.getResponseStr(), TruthsocialStatus.class);
-        } catch (ApiClientException e) {
-            throw e;
-        } catch (JsonSyntaxException e) {
-            logException(e);
-            throw  e;
         } catch (Exception e) {
-            throw new TruthsocialApiException(TruthsocialStatusApiImpl.class.getName(), e.getMessage());
+            throw new TruthsocialApiException("Error publicando un estado en Truthsocial: " + text, e);
         }
     }
     
     @Override
     public TruthsocialStatus postStatus(String text, String filePath) {
-        try {
-            if (filePath != null) {
-                TruthsocialMediaAttachment mediaAttachment = this.uploadImage(filePath);
+        if (filePath != null) {
+            TruthsocialMediaAttachment mediaAttachment = this.uploadImage(filePath);
+            try {
                 Thread.sleep(2500);
-                return this.postStatusWithImage(text, mediaAttachment);
+            } catch (InterruptedException e) {
+                log.warn("No se logró cumplir la interrupción mientras se posteaba una imagen");
             }
-            
-            return this.postStatusWithImage(text, null);
-        } catch (Exception e) {
-            throw new TruthsocialApiException(TruthsocialStatusApiImpl.class.getName(), e.getMessage());
+            return this.postStatusWithImage(text, mediaAttachment);
         }
+
+        return this.postStatusWithImage(text, null);
     }
     
     @Override
-    public TruthsocialMediaAttachment uploadImage(String filePath) throws Exception {
+    public TruthsocialMediaAttachment uploadImage(String filePath) {
         String endpoint = this.apiConfig.getProperty("UploadImage_endpoint");
         int okStatus = Integer.parseInt(this.apiConfig.getProperty("UploadImage_ok_status"));
         
@@ -138,16 +124,11 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
             request.addFileFormData("file", filePath);
             
             ApiResponse response = this.client.executeApiRequest(request);
+            log.debug("Response uploadImage: {}", response.getResponseStr());
             
             return this.gson.fromJson(response.getResponseStr(), TruthsocialMediaAttachment.class);
-        } catch (ApiClientException e) {
-            throw e;
-        } catch (JsonSyntaxException e) {
-            logException(e);
-            throw  e;
         } catch (Exception e) {
-            logException(e);
-            throw new TruthsocialApiException(TruthsocialStatusApiImpl.class.getName(), e.getMessage());
+            throw new TruthsocialApiException("Error subiendo una imagen a Truthsocial: " + filePath, e);
         }
     }
     
@@ -204,16 +185,11 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
             request = this.addHeaders(request, true);
             
             ApiResponse response = this.client.executeApiRequest(request);
+            log.debug("Response executeSimplePost: {}", response.getResponseStr());
             
             return this.gson.fromJson(response.getResponseStr(), TruthsocialStatus.class);
-        } catch (ApiClientException e) {
-            throw e;
-        } catch (JsonSyntaxException e) {
-            logException(e);
-            throw  e;
         } catch (Exception e) {
-            logException(e);
-            throw new TruthsocialApiException(TruthsocialStatusApiImpl.class.getName(), e.getMessage());
+            throw new TruthsocialApiException("Error ejecutando un POST en Truthsocial: " + uri, e);
         }
     }
 
@@ -281,14 +257,8 @@ public class TruthsocialStatusApiImpl extends TruthsocialBaseApi implements Trut
             }
 
             return new TruthsocialStatusListResponse(statuses, newNextPage);
-        } catch (ApiClientException e) {
-            throw e;
-        } catch (JsonSyntaxException e) {
-            logException(e);
-            throw e;
         } catch (Exception e) {
-            logException(e);
-            throw new TruthsocialApiException(TruthsocialBaseApi.class.getName(), e.getMessage());
+            throw new TruthsocialApiException("Error recuperando una página del timeline de Truthsocial", e);
         }
     }
 

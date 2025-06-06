@@ -1,6 +1,5 @@
 package com.laboratorio.api;
 
-import com.laboratorio.clientapilibrary.exceptions.ApiClientException;
 import com.laboratorio.clientapilibrary.utils.ReaderConfig;
 import com.laboratorio.truthsocialapiinterface.impl.TruthsocialStatusApiImpl;
 import com.laboratorio.truthsocialapiinterface.model.TruthsocialAccount;
@@ -22,7 +21,7 @@ import org.apache.logging.log4j.Logger;
  * @author Rafael
  * @version 1.1
  * @created 24/07/2024
- * @updated 04/05/2025
+ * @updated 06/06/2025
  */
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -53,7 +52,7 @@ public class TruthsocialStatusApiTest {
     public void getStatusByInvalidId() {
         String id = "1125AXR11TRE9WQW63";
         
-        assertThrows(ApiClientException.class, () -> {
+        assertThrows(TruthsocialApiException.class, () -> {
             this.statusApi.getStatusById(id);
         });
     }
@@ -91,7 +90,7 @@ public class TruthsocialStatusApiTest {
     public void deleteInvalidStatus() {
         String id = "1125AXR11TRE9WQW63";
         
-        assertThrows(ApiClientException.class, () -> {
+        assertThrows(TruthsocialApiException.class, () -> {
             this.statusApi.deleteStatus(id);
         });
     }
@@ -148,7 +147,7 @@ public class TruthsocialStatusApiTest {
     public void getInvalidRebloggedBy() {
         String id = "QQQ109412553445428617";
         
-        assertThrows(ApiClientException.class, () -> {
+        assertThrows(TruthsocialApiException.class, () -> {
             this.statusApi.getRebloggedBy(id);
         });
     }
@@ -183,7 +182,7 @@ public class TruthsocialStatusApiTest {
     public void getInvalidFavouritedBy() {
         String id = "QQQ109412553445428617";
         
-        assertThrows(ApiClientException.class, () -> {
+        assertThrows(TruthsocialApiException.class, () -> {
             this.statusApi.getFavouritedBy(id);
         });
     }
@@ -200,7 +199,7 @@ public class TruthsocialStatusApiTest {
     public void reblogInvalidStatus() {
         String id = "QQ112836040801154212";
         
-        assertThrows(ApiClientException.class, () -> {
+        assertThrows(TruthsocialApiException.class, () -> {
             this.statusApi.reblogStatus(id);
         });
     }
@@ -220,7 +219,7 @@ public class TruthsocialStatusApiTest {
     public void unreblogInvalidStatus() {
         String id = "QQ112836040801154212";
         
-        assertThrows(ApiClientException.class, () -> {
+        assertThrows(TruthsocialApiException.class, () -> {
             this.statusApi.unreblogStatus(id);
         });
     }
@@ -237,7 +236,7 @@ public class TruthsocialStatusApiTest {
     public void favouriteInvalidStatus() {
         String id = "QQ112836040801154212";
         
-        assertThrows(ApiClientException.class, () -> {
+        assertThrows(TruthsocialApiException.class, () -> {
             this.statusApi.favouriteStatus(id);
         });
     }
@@ -257,7 +256,7 @@ public class TruthsocialStatusApiTest {
     public void unfavouriteInvalidStatus() {
         String id = "QQ112836040801154212";
         
-        assertThrows(ApiClientException.class, () -> {
+        assertThrows(TruthsocialApiException.class, () -> {
             this.statusApi.unfavouriteStatus(id);
         });
     }

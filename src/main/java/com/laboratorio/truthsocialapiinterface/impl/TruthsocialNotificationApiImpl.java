@@ -1,8 +1,6 @@
 package com.laboratorio.truthsocialapiinterface.impl;
 
-import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
-import com.laboratorio.clientapilibrary.exceptions.ApiClientException;
 import com.laboratorio.clientapilibrary.model.ApiMethodType;
 import com.laboratorio.clientapilibrary.model.ApiRequest;
 import com.laboratorio.clientapilibrary.model.ApiResponse;
@@ -17,7 +15,7 @@ import com.laboratorio.truthsocialapiinterface.TruthsocialNotificationApi;
  * @author Rafael
  * @version 1.3
  * @created 25/07/2024
- * @updated 11/03/2024
+ * @updated 06/06/2025
  */
 public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implements TruthsocialNotificationApi {
     public TruthsocialNotificationApiImpl(String accessToken) {
@@ -69,14 +67,8 @@ public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implement
 
             // return accounts;
             return new TruthsocialNotificationListResponse(minId, notifications);
-        } catch (ApiClientException e) {
-            throw e;
-        } catch (JsonSyntaxException e) {
-            logException(e);
-            throw e;
         } catch (Exception e) {
-            logException(e);
-            throw new TruthsocialApiException(TruthsocialNotificationApiImpl.class.getName(), e.getMessage());
+            throw new TruthsocialApiException("Error recuperando una página de notificaciones en Truthsocial", e);
         }
     }
 
