@@ -20,9 +20,9 @@ import org.apache.logging.log4j.Logger;
 /**
  *
  * @author Rafael
- * @version 1.5
+ * @version 1.6
  * @created 24/07/2024
- * @updated 06/06/2025
+ * @updated 10/12/2025
  */
 public class TruthsocialBaseApi {
     protected static final Logger log = LogManager.getLogger(TruthsocialBaseApi.class);
@@ -33,9 +33,18 @@ public class TruthsocialBaseApi {
 
     public TruthsocialBaseApi(String accessToken) {
         this.apiConfig = new ReaderConfig("config//truthsocial_api.properties");
-        this.client = new ApiClient();
         this.accessToken = accessToken;
         this.gson = new Gson();
+        String proxyHost = this.apiConfig.getProperty("truthsocial_proxy_host");
+        String proxyPortStr = this.apiConfig.getProperty("truthsocial_proxy_port");
+        String certificatePath = this.apiConfig.getProperty("truthsocial_proxy_certificate");
+        if (proxyHost != null && !proxyHost.isBlank() && proxyPortStr != null && !proxyPortStr.isBlank()
+                && certificatePath != null && !certificatePath.isBlank()) {
+            int proxyPort = Integer.parseInt(proxyPortStr);
+            this.client = new ApiClient(proxyHost, proxyPort, certificatePath);
+        } else {
+            this.client = new ApiClient();
+        }
     }
     
     // Función que extrae el max_id de la respuesta
@@ -95,7 +104,7 @@ public class TruthsocialBaseApi {
         return request;
     }
     
-    protected List<TruthsocialAccount> getUserList(String uri, int limit, int okStatus) throws Exception {
+    protected List<TruthsocialAccount> getUserList(String uri, int limit, int okStatus) throws TruthsocialApiException {
         try {
             ApiRequest request = new ApiRequest(uri, okStatus, ApiMethodType.GET);
             request.addApiPathParam("limit", Integer.toString(limit));
@@ -112,7 +121,8 @@ public class TruthsocialBaseApi {
     }
     
     // Función que devuelve una página de seguidores o seguidos de una cuenta
-    private TruthsocialAccountListResponse getAccountPage(String uri, int okStatus, int limit, String posicionInicial) throws Exception {
+    private TruthsocialAccountListResponse getAccountPage(String uri, int okStatus,
+            int limit, String posicionInicial) throws TruthsocialApiException {
         try {
             ApiRequest request = new ApiRequest(uri, okStatus, ApiMethodType.GET);
             request.addApiPathParam("limit", Integer.toString(limit));
@@ -139,57 +149,53 @@ public class TruthsocialBaseApi {
                 }
             }
 
-            // return accounts;
             return new TruthsocialAccountListResponse(maxId, accounts);
         } catch (Exception e) {
             throw new TruthsocialApiException("Error recuperando una página de cuentas: " + uri, e);
         }
     }
     
-    protected TruthsocialAccountListResponse getTruthsocialAccountList(InstruccionInfo instruccionInfo, String id, int quantity, String posicionInicial) throws Exception {
+    protected TruthsocialAccountListResponse getTruthsocialAccountList(InstruccionInfo instruccionInfo,
+            String id, int quantity, String posicionInicial) throws TruthsocialApiException {
         List<TruthsocialAccount> accounts = null;
         boolean continuar = true;
         String endpoint = instruccionInfo.getEndpoint();
         String complemento = instruccionInfo.getComplementoUrl();
         int limit = instruccionInfo.getLimit();
         int okStatus = instruccionInfo.getOkStatus();
-        String max_id = posicionInicial;
+        String maxId = posicionInicial;
         
         if (quantity > 0) {
             limit = Math.min(limit, quantity);
         }
         
-        try {
-            String uri = endpoint + "/" + id + "/" + complemento;
-            
-            do {
-                TruthsocialAccountListResponse accountListResponse = this.getAccountPage(uri, okStatus, limit, max_id);
-                if (accounts == null) {
-                    accounts = accountListResponse.getAccounts();
-                } else {
-                    accounts.addAll(accountListResponse.getAccounts());
-                }
-                
-                max_id = accountListResponse.getMaxId();
-                log.debug("getTruthsocialAccountList. Cantidad: " + quantity + ". Recuperados: " + accounts.size() + ". Max_id: " + max_id);
-                if (quantity > 0) {
-                    if ((accounts.size() >= quantity) || (max_id == null)) {
-                        continuar = false;
-                    }
-                } else {
-                    if ((max_id == null) || (accountListResponse.getAccounts().size() < limit)) {
-                        continuar = false;
-                    }
-                }
-            } while (continuar);
+        String uri = endpoint + "/" + id + "/" + complemento;
 
-            if (quantity == 0) {
-                return new TruthsocialAccountListResponse(max_id, accounts);
+        do {
+            TruthsocialAccountListResponse accountListResponse = this.getAccountPage(uri, okStatus, limit, maxId);
+            if (accounts == null) {
+                accounts = accountListResponse.getAccounts();
+            } else {
+                accounts.addAll(accountListResponse.getAccounts());
             }
-            
-            return new TruthsocialAccountListResponse(max_id, accounts.subList(0, Math.min(quantity, accounts.size())));
-        } catch (Exception e) {
-            throw e;
+
+            maxId = accountListResponse.getMaxId();
+            log.debug("getTruthsocialAccountList. Cantidad: " + quantity + ". Recuperados: " + accounts.size() + ". Max_id: " + maxId);
+            if (quantity > 0) {
+                if ((accounts.size() >= quantity) || (maxId == null)) {
+                    continuar = false;
+                }
+            } else {
+                if ((maxId == null) || (accountListResponse.getAccounts().size() < limit)) {
+                    continuar = false;
+                }
+            }
+        } while (continuar);
+
+        if (quantity == 0) {
+            return new TruthsocialAccountListResponse(maxId, accounts);
         }
+
+        return new TruthsocialAccountListResponse(maxId, accounts.subList(0, Math.min(quantity, accounts.size())));
     }
 }
