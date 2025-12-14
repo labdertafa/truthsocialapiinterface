@@ -13,9 +13,9 @@ import com.laboratorio.truthsocialapiinterface.TruthsocialNotificationApi;
 /**
  *
  * @author Rafael
- * @version 1.3
+ * @version 1.4
  * @created 25/07/2024
- * @updated 06/06/2025
+ * @updated 14/12/2025
  */
 public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implements TruthsocialNotificationApi {
     public TruthsocialNotificationApiImpl(String accessToken) {
@@ -65,11 +65,30 @@ public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implement
                 }
             }
 
-            // return accounts;
             return new TruthsocialNotificationListResponse(minId, notifications);
         } catch (Exception e) {
             throw new TruthsocialApiException("Error recuperando una página de notificaciones en Truthsocial", e);
         }
+    }
+    
+    private boolean isContinuar(int quantity, List<TruthsocialNotification> notifications, String minId,
+            TruthsocialNotificationListResponse notificationListResponse, int usedLimit) {
+        log.debug("getAllNotifications. Cantidad: " + quantity + ". Recuperados: " + notifications.size() + ". Min_id: " + minId);
+        if (notificationListResponse.getNotifications().isEmpty()) {
+            return false;
+        } else {
+            if (quantity > 0) {
+                if ((notifications.size() >= quantity) || (minId == null)) {
+                    return false;
+                }
+            } else {
+                if ((minId == null) || (notificationListResponse.getNotifications().size() < usedLimit)) {
+                    return false;
+                }
+            }
+        }
+            
+        return true;
     }
 
     @Override
@@ -83,46 +102,29 @@ public class TruthsocialNotificationApiImpl extends TruthsocialBaseApi implement
             usedLimit = defaultLimit;
         }
         List<TruthsocialNotification> notifications = null;
-        boolean continuar = true;
-        String min_id = posicionInicial;
+        boolean continuar;
+        String minId = posicionInicial;
         
         if (quantity > 0) {
             usedLimit = Math.min(usedLimit, quantity);
         }
         
-        try {
-            do {
-                TruthsocialNotificationListResponse notificationListResponse = getNotificationPage(endpoint, usedLimit, okStatus, min_id);
-                if (notifications == null) {
-                    notifications = notificationListResponse.getNotifications();
-                } else {
-                    notifications.addAll(notificationListResponse.getNotifications());
-                }
-                
-                min_id = notificationListResponse.getMinId();
-                log.debug("getAllNotifications. Cantidad: " + quantity + ". Recuperados: " + notifications.size() + ". Min_id: " + min_id);
-                if (notificationListResponse.getNotifications().isEmpty()) {
-                    continuar = false;
-                } else {
-                    if (quantity > 0) {
-                        if ((notifications.size() >= quantity) || (min_id == null)) {
-                            continuar = false;
-                        }
-                    } else {
-                        if ((min_id == null) || (notificationListResponse.getNotifications().size() < usedLimit)) {
-                            continuar = false;
-                        }
-                    }
-                }
-            } while (continuar);
-
-            if (quantity == 0) {
-                return new TruthsocialNotificationListResponse(min_id, notifications);
+        do {
+            TruthsocialNotificationListResponse notificationListResponse = getNotificationPage(endpoint, usedLimit, okStatus, minId);
+            if (notifications == null) {
+                notifications = notificationListResponse.getNotifications();
+            } else {
+                notifications.addAll(notificationListResponse.getNotifications());
             }
-            
-            return new TruthsocialNotificationListResponse(min_id, notifications.subList(0, Math.min(quantity, notifications.size())));
-        } catch (Exception e) {
-            throw e;
+
+            minId = notificationListResponse.getMinId();
+            continuar = this.isContinuar(quantity, notifications, minId, notificationListResponse, usedLimit);
+        } while (continuar);
+
+        if (quantity == 0) {
+            return new TruthsocialNotificationListResponse(minId, notifications);
         }
+
+        return new TruthsocialNotificationListResponse(minId, notifications.subList(0, Math.min(quantity, notifications.size())));
     }
 }

@@ -20,9 +20,9 @@ import org.apache.logging.log4j.Logger;
 /**
  *
  * @author Rafael
- * @version 1.6
+ * @version 1.7
  * @created 24/07/2024
- * @updated 10/12/2025
+ * @updated 14/12/2025
  */
 public class TruthsocialBaseApi {
     protected static final Logger log = LogManager.getLogger(TruthsocialBaseApi.class);
@@ -155,10 +155,26 @@ public class TruthsocialBaseApi {
         }
     }
     
+    private boolean isContinuar(int quantity, List<TruthsocialAccount> accounts, String maxId,
+            TruthsocialAccountListResponse accountListResponse, int limit) {
+        log.debug("getTruthsocialAccountList. Cantidad: " + quantity + ". Recuperados: " + accounts.size() + ". Max_id: " + maxId);
+        if (quantity > 0) {
+            if ((accounts.size() >= quantity) || (maxId == null)) {
+                return false;
+            }
+        } else {
+            if ((maxId == null) || (accountListResponse.getAccounts().size() < limit)) {
+                return false;
+            }
+        }
+            
+        return true;
+    }
+    
     protected TruthsocialAccountListResponse getTruthsocialAccountList(InstruccionInfo instruccionInfo,
             String id, int quantity, String posicionInicial) throws TruthsocialApiException {
         List<TruthsocialAccount> accounts = null;
-        boolean continuar = true;
+        boolean continuar;
         String endpoint = instruccionInfo.getEndpoint();
         String complemento = instruccionInfo.getComplementoUrl();
         int limit = instruccionInfo.getLimit();
@@ -180,16 +196,7 @@ public class TruthsocialBaseApi {
             }
 
             maxId = accountListResponse.getMaxId();
-            log.debug("getTruthsocialAccountList. Cantidad: " + quantity + ". Recuperados: " + accounts.size() + ". Max_id: " + maxId);
-            if (quantity > 0) {
-                if ((accounts.size() >= quantity) || (maxId == null)) {
-                    continuar = false;
-                }
-            } else {
-                if ((maxId == null) || (accountListResponse.getAccounts().size() < limit)) {
-                    continuar = false;
-                }
-            }
+            continuar = this.isContinuar(quantity, accounts, maxId, accountListResponse, limit);
         } while (continuar);
 
         if (quantity == 0) {

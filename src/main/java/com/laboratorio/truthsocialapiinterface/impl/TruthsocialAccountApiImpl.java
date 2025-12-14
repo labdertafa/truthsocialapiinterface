@@ -18,9 +18,9 @@ import java.util.stream.Collectors;
 /**
  *
  * @author Rafael
- * @version 1.5
+ * @version 1.6
  * @created 10/07/2024
- * @updated 06/06/2025
+ * @updated 14/12/2025
  */
 public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements TruthsocialAccountApi {
     public TruthsocialAccountApiImpl(String accessToken) {
@@ -230,39 +230,35 @@ public class TruthsocialAccountApiImpl extends TruthsocialBaseApi implements Tru
         boolean continuar = true;
         String nextPage = null;
         
-        try {
-            String uri = endpoint;
-            
-            do {
-                TruthsocialSuggestionsListResponse suggestionsListResponse = this.getSuggestionsPage(uri, okStatus, nextPage);
-                log.debug("Elementos recuperados total: " + suggestionsListResponse.getSuggestions().size());
+        String uri = endpoint;
 
-                for (TruthsocialSuggestion suggestion : suggestionsListResponse.getSuggestions()) {
-                    TruthsocialAccount account = this.getAccountById(suggestion.getAccount_id());
-                    accounts.add(account);
-                    log.debug("Account info: " + account.toString());
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        log.warn("No se pudo completar la espera durante la consulta de sugerencias de seguimiento");
-                    }
+        do {
+            TruthsocialSuggestionsListResponse suggestionsListResponse = this.getSuggestionsPage(uri, okStatus, nextPage);
+            log.debug("Elementos recuperados total: " + suggestionsListResponse.getSuggestions().size());
+
+            for (TruthsocialSuggestion suggestion : suggestionsListResponse.getSuggestions()) {
+                TruthsocialAccount account = this.getAccountById(suggestion.getAccount_id());
+                accounts.add(account);
+                log.debug("Account info: " + account.toString());
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    log.warn("No se pudo completar la espera durante la consulta de sugerencias de seguimiento");
                 }
-                
-                nextPage = suggestionsListResponse.getNextPage();
-                log.debug("getGlobalTimeline. Recuperados: " + accounts.size() + ". Next page: " + nextPage);
-                if (suggestionsListResponse.getSuggestions().isEmpty()) {
+            }
+
+            nextPage = suggestionsListResponse.getNextPage();
+            log.debug("getGlobalTimeline. Recuperados: " + accounts.size() + ". Next page: " + nextPage);
+            if (suggestionsListResponse.getSuggestions().isEmpty()) {
+                continuar = false;
+            } else {
+                if ((nextPage == null) || (accounts.size() >= quantity)) {
                     continuar = false;
-                } else {
-                    if ((nextPage == null) || (accounts.size() >= quantity)) {
-                        continuar = false;
-                    }
                 }
-            } while (continuar);
-            
-            return accounts.subList(0, Math.min(quantity, accounts.size()));
-        } catch (Exception e) {
-            throw e;
-        }
+            }
+        } while (continuar);
+
+        return accounts.subList(0, Math.min(quantity, accounts.size()));
     }
 
     @Override
